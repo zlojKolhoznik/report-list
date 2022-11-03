@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portianko_Kursova", "Portianko_Kursova\Portianko_Kursova.csproj", "{5E9B2730-856C-4FDE-868C-89567ACACD12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseClasses", "DatabaseClasses\DatabaseClasses.csproj", "{D1161864-5183-4DC8-902A-25A5F1A4254E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5E9B2730-856C-4FDE-868C-89567ACACD12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E9B2730-856C-4FDE-868C-89567ACACD12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E9B2730-856C-4FDE-868C-89567ACACD12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1161864-5183-4DC8-902A-25A5F1A4254E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1161864-5183-4DC8-902A-25A5F1A4254E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1161864-5183-4DC8-902A-25A5F1A4254E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1161864-5183-4DC8-902A-25A5F1A4254E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

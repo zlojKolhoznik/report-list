@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DatabaseClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,14 @@ namespace Portianko_Kursova
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            using (ReporlistContext context = new ReporlistContext(AppSettings.ReadFromJsonFile("appsettings.json").ConnectionString))
+            {
+                MessageBox.Show("Database created");
+            } 
         }
     }
 }
