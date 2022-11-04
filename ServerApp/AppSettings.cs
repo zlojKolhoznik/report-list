@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Portianko_Kursova
+namespace ServerApp
 {
     internal class AppSettings
     {
