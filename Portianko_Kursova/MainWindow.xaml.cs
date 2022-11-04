@@ -25,13 +25,5 @@ namespace Portianko_Kursova
         {
             InitializeComponent();
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            using (ReporlistContext context = new ReporlistContext(AppSettings.ReadFromJsonFile("appsettings.json").ConnectionString))
-            {
-                MessageBox.Show("Database created");
-            } 
-        }
     }
 }
