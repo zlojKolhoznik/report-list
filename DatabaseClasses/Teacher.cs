@@ -9,5 +9,6 @@
         public List<Subject> Subjects { get; set; }
         public List<Group> Groups { get; set; }
         public List<Lesson> Lessons { get; set; }
+        public List<Mark> Marks { get; set; }
     }
 }
