@@ -1,17 +1,18 @@
 ﻿using DatabaseClasses;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServerApp
 {
     /// <summary>
     /// Class that does account-related work
     /// </summary>
-    internal class AccountManager
+    internal class AccountManager : DatabaseAccessManager
     {
-        private ReporlistContext context;
-
-        public AccountManager(ReporlistContext context)
+        private static object locker = new object();
+        
+        public AccountManager(string connStr) : base(connStr)
         {
-            this.context = context;
+
         }
 
         /// <summary>
@@ -23,15 +24,18 @@ namespace ServerApp
         public User? GetUser(string login)
         {
             User? result = null;
-            lock (context)
+            lock (locker)
             {
-                try
+                using (var context = new ReporlistContext(connStr))
                 {
-                    result = context.Users.Where(u => u.Login == login).SingleOrDefault();
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new ArgumentException("Login has two or more users in database. Could not detect specified user.", nameof(login), ex);
+                    try
+                    {
+                        result = context.Users.Where(u => u.Login == login).SingleOrDefault();
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new ArgumentException("Login has two or more users in database. Could not detect specified user.", nameof(login), ex);
+                    }
                 }
             }
             return result;
@@ -44,22 +48,26 @@ namespace ServerApp
         /// <exception cref="ArgumentException">Thrown when two or more users with login specified found in database</exception>
         public void RemoveUser(string login)
         {
-            lock(context)
+            lock(locker)
             {
-                try
+                using (var context = new ReporlistContext(connStr))
                 {
-                    User? user = context.Users.Where(u => u.Login == login).SingleOrDefault();
-                    if (user == null)
+
+                    try
                     {
-                        return;
+                        User? user = context.Users.Where(u => u.Login == login).SingleOrDefault();
+                        if (user == null)
+                        {
+                            return;
+                        }
+                        context.Users.Remove(user);
                     }
-                    context.Users.Remove(user);
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new ArgumentException("Login has two or more users in database. Could not detect specified user.", nameof(login), ex);
+                    }
+                    context.SaveChanges();
                 }
-                catch (InvalidOperationException ex)
-                {
-                    throw new ArgumentException("Login has two or more users in database. Could not detect specified user.", nameof(login), ex);
-                }
-                context.SaveChanges();
             }
         }
 
@@ -70,14 +78,17 @@ namespace ServerApp
         /// <exception cref="InvalidOperationException">Thrown when user with such login already exists in database</exception>
         public void RegisterUser(User user)
         {
-            lock (context)
+            lock (locker)
             {
-                if (context.Users.Where(u=>u.Login== user.Login).Any())
+                using (var context = new ReporlistContext(connStr))
                 {
-                    throw new InvalidOperationException("Tried to register already registered user");
+                    if (context.Users.Where(u => u.Login == user.Login).Any())
+                    {
+                        throw new InvalidOperationException("Tried to register already registered user");
+                    }
+                    context.Users.Add(user);
+                    context.SaveChanges();
                 }
-                context.Users.Add(user);
-                context.SaveChanges();
             }
         }
 
@@ -94,15 +105,18 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change the password to the current password");
             }
-            lock (context)
+            lock (locker)
             {
-                User? userFromDb = context.Users.Where(u => u.Id == user.Id).SingleOrDefault();
-                if (userFromDb == null)
+                using (var context = new ReporlistContext(connStr))
                 {
-                    throw new ArgumentException("The user is not registered", nameof(user));
+                    User? userFromDb = context.Users.Where(u => u.Id == user.Id).SingleOrDefault();
+                    if (userFromDb == null)
+                    {
+                        throw new ArgumentException("The user is not registered", nameof(user));
+                    }
+                    userFromDb.Password = newPassword;
+                    context.SaveChanges();
                 }
-                userFromDb.Password = newPassword;
-                context.SaveChanges();
             }
         }
 
@@ -115,15 +129,18 @@ namespace ServerApp
         public Student? GetStudent(User user)
         {
             Student? result;
-            lock (context)
+            lock (locker)
             {
-                try
+                using (var context = new ReporlistContext(connStr))
                 {
-                    result = context.Students.Where(s => s.User.Id == user.Id).SingleOrDefault();
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new ArgumentException("Two or more students are binded to that user", nameof(user), ex);
+                    try
+                    {
+                        result = context.Students.Where(s => s.User.Id == user.Id).SingleOrDefault();
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new ArgumentException("Two or more students are binded to that user", nameof(user), ex);
+                    }
                 }
             }
             return result;
@@ -138,16 +155,19 @@ namespace ServerApp
         public Teacher? GetTeacher(User user)
         {
             Teacher? result;
-            lock (context)
+            lock (locker)
             {
-                try
+                using (var context = new ReporlistContext(connStr))
                 {
-                    result = context.Teachers.Where(t => t.User.Id == user.Id).SingleOrDefault();
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new ArgumentException("Two or more students are binded to that user", nameof(user), ex);
-                }
+                    try
+                    {
+                        result = context.Teachers.Where(t => t.User.Id == user.Id).SingleOrDefault();
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new ArgumentException("Two or more students are binded to that user", nameof(user), ex);
+                    }
+                } 
             }
             return result;
         }
