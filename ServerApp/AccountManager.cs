@@ -1,13 +1,10 @@
 ﻿using DatabaseClasses;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerApp
 {
+    /// <summary>
+    /// Class that does account-related work
+    /// </summary>
     internal class AccountManager
     {
         private ReporlistContext context;
