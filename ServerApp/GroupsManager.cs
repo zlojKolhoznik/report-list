@@ -1,12 +1,10 @@
 ﻿using DatabaseClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerApp
 {
+    /// <summary>
+    /// Implements groups getting and adding
+    /// </summary>
     internal class GroupsManager : DatabaseAccessManager
     {
         private static object locker = new object();
@@ -16,6 +14,11 @@ namespace ServerApp
 
         }
 
+        /// <summary>
+        /// Gets the list of groups that study the specified subject
+        /// </summary>
+        /// <param name="subject">Subject to search groups for</param>
+        /// <returns>List of groups that have lessons of the specified subject</Group></returns>
         public List<Group> GetGroups(Subject subject)
         {
             var result = new List<Group>();
@@ -29,6 +32,11 @@ namespace ServerApp
             return result;
         }
 
+        /// <summary>
+        /// Gets the list of groups that are taught by the specified teacher
+        /// </summary>
+        /// <param name="teacher">Teacher to search groups for</param>
+        /// <returns>List of groups that have lessons with the specified teacher</returns>
         public List<Group> GetGroups(Teacher teacher)
         {
             var result = new List<Group>();
@@ -42,6 +50,11 @@ namespace ServerApp
             return result;
         }
 
+        /// <summary>
+        /// Adds a new group to the database
+        /// </summary>
+        /// <param name="group">Group to add</param>
+        /// <exception cref="InvalidOperationException">Thrown when tried to add a groups with already existing name</exception>
         public void AddGroup(Group group)
         {
             lock (locker)
@@ -58,6 +71,12 @@ namespace ServerApp
             }
         }
 
+        /// <summary>
+        /// Changes the name of the specified group in the database
+        /// </summary>
+        /// <param name="group">Group whose name is to be changed</param>
+        /// <param name="newName">The new name of the group</param>
+        /// <exception cref="InvalidOperationException">Thrown when the new name of the group is equal to its current name or when tried to rename groups that is not in the database</exception>
         public void RenameGroup(Group group, string newName)
         {
             if (group.Name == newName)
