@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ServerApp
 {
+    /// <summary>
+    /// Implements adding, getting and changing lessons
+    /// </summary>
     internal class LessonsManager : DatabaseAccessManager
     {
         private static object locker = new object();
@@ -16,6 +19,12 @@ namespace ServerApp
 
         }
 
+        /// <summary>
+        /// Gets lessons of the specified group from the specified subject
+        /// </summary>
+        /// <param name="group">Group, whose lessons the method is to return</param>
+        /// <param name="subject">Subject to search lessons from</param>
+        /// <returns>The list of lessons of the specified group from the specified subject</returns>
         public List<Lesson> GetLessons(Group group, Subject subject)
         {
             List<Lesson> result;
@@ -26,6 +35,12 @@ namespace ServerApp
             return result;
         }
 
+        /// <summary>
+        /// Gets lessons of the specified group on the specified date
+        /// </summary>
+        /// <param name="group">Group, whose lessons the method is to return</param>
+        /// <param name="date">Date to search lessons on</param>
+        /// <returns>The list of lessons of the specified group on the specified date</returns>
         public List<Lesson> GetLessons(Group group, DateTime date)
         {
             List<Lesson> result;
@@ -36,6 +51,12 @@ namespace ServerApp
             return result;
         }
 
+        /// <summary>
+        /// Gets lessons of the specified teacher from the specified subject
+        /// </summary>
+        /// <param name="teacher">Teacher, whose lessons the method is to return</param>
+        /// <param name="subject">Subject to search lessons from</param>
+        /// <returns>The list of lessons of the specified teacher from the specified subject</returns>
         public List<Lesson> GetLessons(Teacher teacher, Subject subject)
         {
             List<Lesson> result;
@@ -46,6 +67,13 @@ namespace ServerApp
             return result;
         }
 
+
+        /// <summary>
+        /// Gets lessons of the specified teacher on the specified date
+        /// </summary>
+        /// <param name="teacher">Teacher, whose lessons the method is to return</param>
+        /// <param name="date">Date to search lessons on</param>
+        /// <returns>The list of lessons of the specified teacher on the specified date</returns>
         public List<Lesson> GetLessons(Teacher teacher, DateTime date)
         {
             List<Lesson> result;
@@ -56,6 +84,12 @@ namespace ServerApp
             return result;
         }
 
+        /// <summary>
+        /// Gets lessons of the specified teacher in the specified group
+        /// </summary>
+        /// <param name="teacher">Teacher, whose lessons the method is to return</param>
+        /// <param name="group">Group, whose lessons the method is to return</param>
+        /// <returns>The list of lessons of the specified teacher from the specified subject</returns>
         public List<Lesson> GetLessons(Teacher teacher, Group group)
         {
             List<Lesson> result;
@@ -66,18 +100,36 @@ namespace ServerApp
             return result;
         }
 
+        /// <summary>
+        /// Adds a new lesson to the database
+        /// </summary>
+        /// <param name="lesson">Lesson to add</param>
+        /// <exception cref="InvalidOperationException">Thrown when tried to add the new lesson for the group or teacher on the occupied time</exception>
         public void AddLesson(Lesson lesson)
         {
             lock (locker)
             {
                 using (var context = new ReporlistContext(connStr))
                 {
+                    if (context.Lessons.Any(l => (l.Group.Id == lesson.Group.Id || l.Teacher.Id == lesson.Teacher.Id) && Math.Abs((l.Date - lesson.Date).Hours) < 1))
+                    {
+                        throw new InvalidOperationException("Cannot add a new lesson if there is a lesson in the database for the same group or the same teacher on the same time");
+                    }
                     context.Lessons.Add(lesson);
                     context.SaveChanges();
                 }
             }
         }
 
+        /// <summary>
+        /// Changes the information about the lesson in the database
+        /// </summary>
+        /// <param name="lesson">Lesson to change information for</param>
+        /// <param name="newTopic">New topic of the lesson, ignored if null</param>
+        /// <param name="newDate">New date of the lesson, ignored if null</param>
+        /// <param name="newSubject">New subject of the lesson, ignored if null</param>
+        /// <param name="newTeacher">New teacher of the lesson, ignored if null</param>
+        /// <exception cref="InvalidOperationException">Thrown when tried to change the property to its current value</exception>
         public void ChangeLessonInfo(Lesson lesson, string? newTopic = null, DateTime? newDate = null, Subject? newSubject = null, Teacher? newTeacher = null)
         {
             if (lesson.Topic == newTopic)
@@ -105,6 +157,11 @@ namespace ServerApp
             }
         }
 
+        /// <summary>
+        /// Removes a lesson from the database
+        /// </summary>
+        /// <param name="lesson">The lesson to remove</param>
+        /// <exception cref="InvalidOperationException">Thrown when tried to remove a lesson that is not in the database</exception>
         public void RemoveLesson(Lesson lesson)
         {
             lock (locker)
