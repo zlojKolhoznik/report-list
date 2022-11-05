@@ -64,16 +64,7 @@ namespace ServerApp
             }
             lock (locker)
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    Subject? subjectFromDb = context.Subjects.FirstOrDefault(s => s.Name == subject.Name);
-                    if (subjectFromDb == null)
-                    {
-                        throw new InvalidOperationException("Group you are trying to access is not in the database");
-                    }
-                    subjectFromDb.Name = newName;
-                    context.SaveChanges();
-                }
+                subject.Name = newName;
             }
         }
     }

@@ -98,7 +98,6 @@ namespace ServerApp
         /// <param name="user">The user to change password</param>
         /// <param name="newPassword">The new password of the user. Cannot be the same as the current password</param>
         /// <exception cref="InvalidOperationException">Thrown when the new password is equal to the current password</exception>
-        /// <exception cref="ArgumentException">Thrown when the user is not registered</exception>
         public void ChangePassword(User user, string newPassword)
         {
             if (user.Password == newPassword)
@@ -107,16 +106,7 @@ namespace ServerApp
             }
             lock (locker)
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    User? userFromDb = context.Users.Where(u => u.Id == user.Id).SingleOrDefault();
-                    if (userFromDb == null)
-                    {
-                        throw new ArgumentException("The user is not registered", nameof(user));
-                    }
-                    userFromDb.Password = newPassword;
-                    context.SaveChanges();
-                }
+                user.Password = newPassword;
             }
         }
 

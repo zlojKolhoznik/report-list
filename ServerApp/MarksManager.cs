@@ -79,21 +79,16 @@ namespace ServerApp
         /// </summary>
         /// <param name="mark">The mark, value of which is to be changed</param>
         /// <param name="newValue">New value of the mark</param>
-        /// <exception cref="ArgumentException">Thrown when the mark is not in database</exception>
+        /// <exception cref="InvalidOperationException">Thrown when trying to change mark value to its current value</exception>
         public void ChangeMark(Mark mark, int newValue)
         {
+            if (mark.Value == newValue)
+            {
+                throw new InvalidOperationException("Cannot change mark value to its current value");
+            }
             lock (locker)
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    Mark? markFromDb = context.Marks.FirstOrDefault(m => m.Id == mark.Id);
-                    if (markFromDb == null)
-                    {
-                        throw new ArgumentException("This mark is not in database", nameof(mark));
-                    }
-                    markFromDb.Value = newValue;
-                    context.SaveChanges();
-                }
+                mark.Value = newValue;
             }
         }
 

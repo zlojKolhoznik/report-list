@@ -76,7 +76,7 @@ namespace ServerApp
         /// </summary>
         /// <param name="group">Group whose name is to be changed</param>
         /// <param name="newName">The new name of the group</param>
-        /// <exception cref="InvalidOperationException">Thrown when the new name of the group is equal to its current name or when tried to rename groups that is not in the database</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the new name of the group is equal to its current name</exception>
         public void RenameGroup(Group group, string newName)
         {
             if (group.Name == newName)
@@ -85,16 +85,7 @@ namespace ServerApp
             }
             lock (locker)
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    Group? groupFromDb = context.Groups.FirstOrDefault(g => g.Name == group.Name);
-                    if (groupFromDb == null)
-                    {
-                        throw new InvalidOperationException("Group you are trying to access is not in the database");
-                    }
-                    groupFromDb.Name = newName;
-                    context.SaveChanges();
-                }
+                group.Name = newName;
             }
         }
     }
