@@ -16,6 +16,7 @@ namespace DatabaseClasses
         public ReporlistContext(string connectionString)
         {
             this.connectionString = connectionString;
+            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 

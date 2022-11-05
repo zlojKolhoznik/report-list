@@ -9,5 +9,6 @@
         public Group Group { get; set; } = null!;
         public Subject Subject { get; set; } = null!;
         public Teacher Teacher { get; set; } = null!;
+        public List<Mark> Marks { get; set; }
     }
 }
