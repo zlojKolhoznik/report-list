@@ -66,21 +66,59 @@ namespace ServerApp
             return result;
         }
 
-        // TODO: Implement AddLesson, RemoveLesson and ChangeLessonInfo
-
-        private void AddLesson(Lesson lesson)
+        public void AddLesson(Lesson lesson)
         {
-
+            lock (locker)
+            {
+                using (var context = new ReporlistContext(connStr))
+                {
+                    context.Lessons.Add(lesson);
+                    context.SaveChanges();
+                }
+            }
         }
 
-        private void ChangeLessonInfo(Lesson lesson, string? newTopic = null, DateTime? newDate = null, Subject? newSubject = null, Teacher? newTeacher = null)
+        public void ChangeLessonInfo(Lesson lesson, string? newTopic = null, DateTime? newDate = null, Subject? newSubject = null, Teacher? newTeacher = null)
         {
-
+            if (lesson.Topic == newTopic)
+            {
+                throw new InvalidOperationException("Cannot change topic to its current value");
+            }
+            if (lesson.Date == newDate)
+            {
+                throw new InvalidOperationException("Cannot change date to its current value");
+            }
+            if (lesson.Subject == newSubject)
+            {
+                throw new InvalidOperationException("Cannot change subject to its current value");
+            }
+            if (lesson.Teacher == newTeacher)
+            {
+                throw new InvalidOperationException("Cannot change teacher to its current value");
+            }
+            lock (locker)
+            {
+                lesson.Topic = newTopic == null ? lesson.Topic : newTopic;
+                lesson.Date = newDate == null ? lesson.Date : (DateTime)newDate;
+                lesson.Subject = newSubject == null ? lesson.Subject : newSubject;
+                lesson.Teacher = newTeacher == null ? lesson.Teacher : newTeacher;
+            }
         }
 
-        private void RemoveLesson(Lesson lesson)
+        public void RemoveLesson(Lesson lesson)
         {
-
+            lock (locker)
+            {
+                using (var context = new ReporlistContext(connStr))
+                {
+                    if (!context.Lessons.Any(l => l.Id == lesson.Id))
+                    {
+                        throw new InvalidOperationException("Cannot remove the lesson that is not in the database");
+                    }
+                    context.Lessons.Remove(lesson);
+                    context.SaveChanges();
+                }
+            }
         }
     }
 }
