@@ -96,11 +96,11 @@ namespace ServerApp
         {
             if (subject != null)
             {
-                source = source.Where(m => m.Subject.Id == subject!.Id).ToList();
+                source = source.Where(m => m.Lesson?.Subject.Id == subject!.Id || m.Homework?.Subject.Id == subject!.Id).ToList();
             }
             if (teacher != null)
             {
-                source = source.Where(m => m.Teacher.Id == teacher!.Id).ToList();
+                source = source.Where(m => m.Lesson?.Teacher.Id == teacher!.Id || m.Homework?.Teacher.Id == teacher!.Id).ToList();
             }
             return source;
         }
