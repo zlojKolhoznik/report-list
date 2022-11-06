@@ -1,27 +1,21 @@
-﻿using DatabaseClasses;
+﻿using ServerApp.Model;
 
 namespace ServerApp
 {
-    internal class SubjectsManager : DatabaseAccessManager
+    internal class SubjectsManager
     {
-        private static object locker = new object();
-
-        public SubjectsManager(string connStr) : base(connStr)
-        {
-
-        }
 
         /// <summary>
-        /// Gets subjects that are lerant by the specified group
+        /// Gets subjects that are learnt by the specified group
         /// </summary>
         /// <param name="group">Group to search subjects for</param>
         /// <returns>The list of subjects that the specified group has lesspns from</returns>
         public List<Subject> GetSubjects(Group group)
         {
             var result = new List<Subject>();
-            foreach (var lesson in group.Lessons)
+            foreach (var lesson in group.GroupsLessons.Select(gl=>gl.Lessons))
             {
-                if (!result.Any(s => s.Id == lesson.Subject.Id))
+                if (!result.Any(s => s.Id == lesson.SubjectId))
                 {
                     result.Add(lesson.Subject);
                 }
@@ -33,20 +27,51 @@ namespace ServerApp
         /// Adds a new subject to the database
         /// </summary>
         /// <param name="subject">Subject to add</param>
-        /// <exception cref="InvalidOperationException">Thrown when tried to add a subject with already existing name</exception>
-        public void AddSubject(Subject subject)
+        /// <exception cref="InvalidOperationException"></exception>
+        public async void AddSubject(Subject subject)
         {
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                using (var context = new ReporlistContext(connStr))
+                if (context.Subjects.Any(s => s.Name == subject.Name))
                 {
-                    if (context.Subjects.Any(s => s.Name == subject.Name))
-                    {
-                        throw new InvalidOperationException("Subject with this name already exists in database");
-                    }
-                    context.Subjects.Add(subject);
-                    context.SaveChanges();
+                    throw new InvalidOperationException("Subject with this name already exists in database");
                 }
+                await context.Subjects.AddAsync(subject);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Removes the subject from the database
+        /// </summary>
+        /// <remarks>This method will also remove all marks, homework and lessons from this subject. Use wisely</remarks>
+        /// <param name="subject"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public async void RemoveSubject(Subject subject)
+        {
+            using (var context = new ReporlistContext())
+            {
+                var toRemove = context.Subjects.FirstOrDefault(t => t.Id == subject.Id);
+                if (toRemove == null)
+                {
+                    throw new ArgumentException("Cannot remove the teacehr who is not in the database", nameof(subject));
+                }
+                HomeworksManager hwm = new HomeworksManager();
+                LessonsManager lm = new LessonsManager();
+                foreach (var homework in toRemove.Homeworks)
+                {
+                    hwm.RemoveHomework(homework);
+                }
+                foreach (var lesson in toRemove.Lessons)
+                {
+                    lm.RemoveLesson(lesson);
+                }
+                foreach (var subjectTeacher in toRemove.SubjectsTeachers)
+                {
+                    context.SubjectsTeachers.Remove(subjectTeacher);
+                }
+                context.Remove(toRemove);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -55,16 +80,23 @@ namespace ServerApp
         /// </summary>
         /// <param name="subject">Subject whose name is to be changed</param>
         /// <param name="newName">The new name of the subject</param>
-        /// <exception cref="InvalidOperationException">Thrown when the new name of the subject is equal to its current name or when tried to rename subject that is not in the database</exception>
-        public void RenameGroup(Subject subject, string newName)
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public async void RenameSubject(Subject subject, string newName)
         {
             if (subject.Name == newName)
             {
                 throw new InvalidOperationException("Cannot change the name of the group to the current name");
             }
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                subject.Name = newName;
+                var toRemove = context.Subjects.FirstOrDefault(s => s.Id == subject.Id);
+                if (toRemove == null)
+                {
+                    throw new ArgumentException("Cannot remove the subject that is not in the database", nameof(subject));
+                }
+                context.Subjects.Remove(toRemove);
+                await context.SaveChangesAsync();
             }
         }
     }

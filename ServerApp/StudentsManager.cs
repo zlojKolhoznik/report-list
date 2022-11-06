@@ -1,32 +1,54 @@
-﻿using DatabaseClasses;
+﻿using ServerApp.Model;
 
 namespace ServerApp
 {
     /// <summary>
     /// Implements students adding
     /// </summary>
-    internal class StudentsManager : DatabaseAccessManager
+    internal class StudentsManager
     {
-        private static object locker = new object();
-
-        public StudentsManager(string connStr) : base(connStr)
-        {
-
-        }
-
         /// <summary>
         /// Adds a new student to the database
         /// </summary>
         /// <param name="student">Student to be added</param>
-        public void AddStudent(Student student)
+        public async void AddStudent(Student student)
         {
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                using (var context = new ReporlistContext(connStr))
+                if (context.Teachers.Any(t => t.UserId == student.UserId) || context.Students.Any(s => s.UserId == student.UserId))
                 {
-                    context.Students.Add(student);
-                    context.SaveChanges();
+                    throw new ArgumentException($"Cannot add this teacher to the database. The user with ID {student.UserId} is already binded to a teacher or a student", nameof(student));
                 }
+                await context.Students.AddAsync(student);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Removes a student from the database
+        /// </summary>
+        /// <remarks>This method will also remove all the marks and will delete the account of this user. Use wisely</remarks>
+        /// <param name="student">A student ro remove</param>
+        /// <exception cref="ArgumentException"></exception>
+        public async void RemoveStudent(Student student)
+        {
+            using (var context = new ReporlistContext())
+            {
+                var toRemove = context.Students.FirstOrDefault(s => s.Id == student.Id);
+                if (toRemove == null)
+                {
+                    throw new ArgumentException("Cannot remove the student who is not in the database", nameof(student));
+                }
+                MarksManager mm = new MarksManager();
+                AccountManager am = new AccountManager();
+                string login = toRemove.User.Login;
+                foreach (var mark in toRemove.Marks)
+                {
+                    mm.RemoveMark(mark);
+                }
+                context.Students.Remove(toRemove);
+                am.RemoveUser(login);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -37,11 +59,9 @@ namespace ServerApp
         /// <param name="newName">New name of the student, no affect if null</param>
         /// <param name="newSurname">New surname of the student, no affect if null</param>
         /// <param name="newGroup">New group of the student, no affect if null</param>
-        /// <exception cref="InvalidOperationException">Thrown when tried to change data to its current value</exception>
-        public void ChangeStudentData(Student student, string? newName = null, string? newSurname = null, Group? newGroup = null)
+        /// <exception cref="InvalidOperationException"></exception>
+        public async void ChangeStudentData(Student student, string? newName = null, string? newSurname = null, Group? newGroup = null)
         {
-            lock (locker)
-            {
                 if (student.Name == newName)
                 {
                     throw new InvalidOperationException("Cannot change name to its current value");
@@ -54,9 +74,17 @@ namespace ServerApp
                 {
                     throw new InvalidOperationException("Cannot change group to its current value");
                 }
-                student.Name = newName == null ? student.Name : newName;
-                student.Surname = newSurname == null ? student.Surname : newSurname;
-                student.Group = newGroup == null ? student.Group : newGroup;
+            using (var context = new ReporlistContext())
+            {
+                var toChange = context.Students.FirstOrDefault(s => s.Id == student.Id);
+                if (toChange == null)
+                {
+                    throw new ArgumentException("Cannot change information about the students who is not in the database");
+                }
+                toChange.Name = newName == null ? toChange.Name : newName;
+                toChange.Surname = newSurname == null ? toChange.Surname : newSurname;
+                toChange.Group = newGroup == null ? toChange.Group : newGroup;
+                await context.SaveChangesAsync();
             }
         }
     }

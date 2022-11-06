@@ -1,41 +1,11 @@
-﻿using DatabaseClasses;
-
+﻿using ServerApp.Model;
 namespace ServerApp
 {
     /// <summary>
     /// Implements marks getting and adding
     /// </summary>
-    internal class MarksManager : DatabaseAccessManager
+    internal class MarksManager
     {
-        private static object locker = new object();
-
-        public MarksManager(string connStr) : base(connStr)
-        {
-
-        }
-
-        /// <summary>
-        /// Gets the list of marks of the specified student
-        /// </summary>
-        /// <param name="student">Student whose marks method is to return</param>
-        /// <param name="subject">Subject of marks method is to return, all marks if null</param>
-        /// <returns>The List of marks of the specified student</returns>
-        public List<Mark> GetMarks(Student student, Subject? subject = null)
-        {
-            List<Mark> result;
-            lock (locker)
-            {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    result = context.Marks.Where(s => s.Student.Id == student.Id).ToList();
-                }
-            }
-            if (subject != null)
-            {
-                result = SelectMarks(result, subject);
-            }
-            return result;
-        }
 
         /// <summary>
         /// Gets the list of marks of the specified student
@@ -46,13 +16,10 @@ namespace ServerApp
         /// <returns>The List of marks of the specified group</returns>
         public List<Mark> GetMarks(Group group, Subject? subject = null, Teacher? teacher = null)
         {
-            List<Mark> result;
-            lock (locker)
+            var result = new List<Mark>();
+            using (var context = new ReporlistContext())
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    result = context.Marks.Where(s => s.Student.Group.Id == group.Id).ToList();
-                }
+                result = context.Marks.Where(s => s.Student.Group.Id == group.Id).ToList();
             }
             result = SelectMarks(result, subject, teacher);
             return result;
@@ -62,15 +29,12 @@ namespace ServerApp
         /// Adds a new mark to the database
         /// </summary>
         /// <param name="mark">Mark the method is to add</param>
-        public void AddMark(Mark mark)
+        public async void AddMark(Mark mark)
         {
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    context.Marks.Add(mark);
-                    context.SaveChanges();
-                }
+                await context.Marks.AddAsync(mark);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -79,16 +43,42 @@ namespace ServerApp
         /// </summary>
         /// <param name="mark">The mark, value of which is to be changed</param>
         /// <param name="newValue">New value of the mark</param>
-        /// <exception cref="InvalidOperationException">Thrown when trying to change mark value to its current value</exception>
-        public void ChangeMark(Mark mark, int newValue)
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public async void ChangeMark(Mark mark, int newValue)
         {
             if (mark.Value == newValue)
             {
                 throw new InvalidOperationException("Cannot change mark value to its current value");
             }
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
+                var toChange = context.Marks.FirstOrDefault(m => m.Id == mark.Id);
+                if (toChange == null)
+                {
+                    throw new ArgumentException("Cannot change the mark that is not in the database", nameof(mark));
+                }
                 mark.Value = newValue;
+                await context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Removes a mark from the database
+        /// </summary>
+        /// <param name="mark">Mark to remove</param>
+        /// <exception cref="ArgumentException"></exception>
+        public async void RemoveMark(Mark mark)
+        {
+            using (var context = new ReporlistContext())
+            {
+                var toRemove = context.Marks.FirstOrDefault(m => m.Id == mark.Id);
+                if (toRemove == null)
+                {
+                    throw new ArgumentException("Cannot remove the mark that is not in the database", nameof(mark));
+                }
+                context.Marks.Remove(mark);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -96,11 +86,11 @@ namespace ServerApp
         {
             if (subject != null)
             {
-                source = source.Where(m => m.Lesson?.Subject.Id == subject!.Id || m.Homework?.Subject.Id == subject!.Id).ToList();
+                source = source.Where(m => m.Lesson?.Subject.Id == subject.Id || m.Homework?.Subject.Id == subject.Id).ToList();
             }
             if (teacher != null)
             {
-                source = source.Where(m => m.Lesson?.Teacher.Id == teacher!.Id || m.Homework?.Teacher.Id == teacher!.Id).ToList();
+                source = source.Where(m => m.Lesson?.Teacher.Id == teacher.Id || m.Homework?.Teacher.Id == teacher.Id).ToList();
             }
             return source;
         }

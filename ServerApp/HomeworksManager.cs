@@ -1,25 +1,12 @@
-﻿using DatabaseClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ServerApp.Model;
 
 namespace ServerApp
 {
     /// <summary>
     /// Implements adding, getting, removing and changing the information about homeworks
     /// </summary>
-    internal class HomeworksManager : DatabaseAccessManager
+    internal class HomeworksManager
     {
-        private static object locker = new object();
-
-        public HomeworksManager(string connStr) : base(connStr)
-        {
-
-        }
-
         /// <summary>
         /// Gets homeworks of the specified groups from the specified subject
         /// </summary>
@@ -29,9 +16,9 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Group group, Subject subject)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext(connStr))
+            using (var context = new ReporlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.Group.Id == group.Id && hw.Subject.Id == subject.Id).ToList();
+                result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.SubjectId == subject.Id).ToList();
             }
             return result;
         }
@@ -45,9 +32,9 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Group group, DateTime dueDate)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext(connStr))
+            using (var context = new ReporlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.Group.Id == group.Id && hw.DueDate.Date == dueDate.Date).ToList();
+                result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.DueDate.Date == dueDate.Date).ToList();
             }
             return result;
         }
@@ -61,9 +48,9 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Teacher teacher, Group group)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext(connStr))
+            using (var context = new ReporlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.Group.Id == group.Id && hw.Teacher.Id == teacher.Id).ToList();
+                result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.TeacherId == teacher.Id).ToList();
             }
             return result;
         }
@@ -77,9 +64,9 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Teacher teacher, Subject subject)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext(connStr))
+            using (var context = new ReporlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.Teacher.Id == teacher.Id && hw.Subject.Id == subject.Id).ToList();
+                result = context.Homeworks.Where(hw => hw.TeacherId == teacher.Id && hw.SubjectId == subject.Id).ToList();
             }
             return result;
         }
@@ -88,37 +75,37 @@ namespace ServerApp
         /// Adds a new homework to the database
         /// </summary>
         /// <param name="homework">Homework to add</param>
-        public void AddHomework(Homework homework)
+        public async void AddHomework(Homework homework)
         {
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                using (var context = new ReporlistContext(connStr))
-                {
-                    context.Homeworks.Add(homework);
-                    context.SaveChanges();
-                }
+                await context.Homeworks.AddAsync(homework);
+                await context.SaveChangesAsync();
             }
         }
 
         /// <summary>
         /// Removes the homework from the database
         /// </summary>
+        /// <remarks>This method will also remove all the marks for this homework. Use wisely</remarks>
         /// <param name="homework">Homework to remove</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        public void RemoveHomework(Homework homework)
+        /// <exception cref="ArgumentException"></exception>
+        public async void RemoveHomework(Homework homework)
         {
-            using (var context = new ReporlistContext(connStr))
+            using (var context = new ReporlistContext())
             {
-                if (!context.Homeworks.Any(hw => hw.Id == homework.Id))
+                var toRemove = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id);
+                MarksManager mm = new MarksManager();
+                if (toRemove == null)
                 {
-                    throw new InvalidOperationException("Cannot remove the homework that is not in the database");
+                    throw new ArgumentException("Cannot remove the homework that is not in the database", nameof(homework));
                 }
-                lock (locker)
+                foreach (var mark in toRemove.Marks)
                 {
-                    Homework toRemove = context.Homeworks.First(hw => hw.Id == homework.Id);
-                    context.Homeworks.Remove(toRemove);
-                    context.SaveChanges();
+                    mm.RemoveMark(mark);
                 }
+                context.Homeworks.Remove(toRemove);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -133,7 +120,7 @@ namespace ServerApp
         /// <param name="newFileExtension">Extension of the new file with the task, ignored if null</param>
         /// <param name="newDueDate">New date on which students must do the homework, ignored if null</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void ChangeHomeworkInfo(Homework homework, byte[]? newFileBytes = null, string? newFileExtension = null, DateTime? newDueDate = null)
+        public async void ChangeHomeworkInfo(Homework homework, byte[]? newFileBytes = null, string? newFileExtension = null, DateTime? newDueDate = null)
         {
             if (newFileBytes == null ^ newFileExtension == null)
             {
@@ -143,12 +130,19 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change the due date to its current value");
             }
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                homework.DueDate = newDueDate == null ? homework.DueDate : (DateTime)newDueDate;
-                homework.FileExtension = newFileExtension == null ? homework.FileExtension : newFileExtension;
-                homework.FileBytes = newFileBytes == null ? homework.FileBytes : newFileBytes;
+                var toChange = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id);
+                if (toChange == null)
+                {
+                    throw new ArgumentException("Cannot change the homework that is not in the database", nameof(homework));
+                }
+                toChange.DueDate = newDueDate == null ? toChange.DueDate : (DateTime)newDueDate;
+                toChange.FileExtension = newFileExtension == null ? toChange.FileExtension : newFileExtension;
+                toChange.FileBytes = newFileBytes == null ? toChange.FileBytes : newFileBytes;
+                await context.SaveChangesAsync();
             }
+            
         }
     }
 }

@@ -1,34 +1,71 @@
-﻿using DatabaseClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ServerApp.Model;
 
 namespace ServerApp
 {
-    internal class TeachersManager : DatabaseAccessManager
+    internal class TeachersManager
     {
-        private object locker = new object();
-
-        public TeachersManager(string connStr) : base(connStr)
-        {
-
-        }
-
-        // <summary>
+        /// <summary>
         /// Adds a new teacher to the database
         /// </summary>
+        /// <remarks>DO NOT include the list of subjects and lessons in the Teacher object</remarks>
         /// <param name="teacher">Student to be added</param>
-        public void AddTeacher(Teacher teacher)
+        /// <param name="subjects">Subjects of this teacher</param>
+        public async void AddTeacher(Teacher teacher, List<Subject>? subjects = null)
         {
-            lock (locker)
+            using (var context = new ReporlistContext())
             {
-                using (var context = new ReporlistContext(connStr))
+                if (context.Teachers.Any(t=>t.UserId==teacher.UserId) || context.Students.Any(s => s.UserId == teacher.UserId))
                 {
-                    context.Teachers.Add(teacher);
-                    context.SaveChanges();
+                    throw new ArgumentException($"Cannot add this teacher to the database. The user with ID {teacher.UserId} is already binded to a teacher or a student", nameof(teacher));
                 }
+                await context.Teachers.AddAsync(teacher);
+                await context.SaveChangesAsync();
+                if (subjects == null)
+                {
+                    return;
+                }
+                foreach (var subject in subjects)
+                {
+                    await context.SubjectsTeachers.AddAsync(new SubjectsTeacher() { SubjectId = subject.Id, TeacherId = teacher.Id });
+                }
+                await context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Removes a teacher from the database
+        /// </summary>
+        /// <remarks>This method will also remove all the marks, lessons and homeworks that have been set by this teacher and will remove the account of this teacher. Use wisely</remarks>
+        /// <param name="teacher">The teacher to remove</param>
+        /// <exception cref="ArgumentException"></exception>
+        public async void RemoveTeahcer(Teacher teacher)
+        {
+            using (var context = new ReporlistContext())
+            {
+                var toRemove = context.Teachers.FirstOrDefault(t => t.Id == teacher.Id);
+                if (toRemove == null)
+                {
+                    throw new ArgumentException("Cannot remove the teacehr who is not in the database", nameof(teacher));
+                }
+                HomeworksManager hwm = new HomeworksManager();
+                LessonsManager lm = new LessonsManager();
+                AccountManager am = new AccountManager();
+                string login = toRemove.User.Login;
+                foreach (var homework in toRemove.Homeworks)
+                {
+                    hwm.RemoveHomework(homework);
+                }
+                foreach (var lesson in toRemove.Lessons)
+                {
+                    lm.RemoveLesson(lesson);
+                }
+                foreach (var subjectTeacher in toRemove.SubjectsTeachers)
+                {
+                    context.SubjectsTeachers.Remove(subjectTeacher);
+                }
+                context.Remove(toRemove);
+                am.RemoveUser(login);
+                await context.SaveChangesAsync();
             }
         }
 
@@ -38,23 +75,30 @@ namespace ServerApp
         /// <param name="teacher">Student whose data to be changed</param>
         /// <param name="newName">New name of the teacher, no affect if null</param>
         /// <param name="newSurname">New surname of the teacher, no affect if null</param>
-        /// <param name="newGroup">New group of the teacher, no affect if null</param>
-        /// <exception cref="InvalidOperationException">Thrown when tried to change data to its current value</exception>
-        public void ChangeTeachertData(Teacher teacher, string? newName = null, string? newSurname = null)
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public async void ChangeTeachertData(Teacher teacher, string? newName = null, string? newSurname = null)
         {
-            lock (locker)
+            if (teacher.Name == newName)
             {
-                if (teacher.Name == newName)
-                {
-                    throw new InvalidOperationException("Cannot change name to its current value");
-                }
-                if (teacher.Surname == newSurname)
-                {
-                    throw new InvalidOperationException("Cannot change surname to its current value");
-                }
-                teacher.Name = newName == null ? teacher.Name : newName;
-                teacher.Surname = newSurname == null ? teacher.Surname : newSurname;
+                throw new InvalidOperationException("Cannot change name to its current value");
             }
+            if (teacher.Surname == newSurname)
+            {
+                throw new InvalidOperationException("Cannot change surname to its current value");
+            }
+            using (var context = new ReporlistContext())
+            {
+                var toChange = context.Teachers.FirstOrDefault(t => t.Id == teacher.Id);
+                if (toChange == null)
+                {
+                    throw new ArgumentException("THe specified teacher is not in the database", nameof(teacher));
+                }
+                toChange.Name = newName == null ? toChange.Name : newName;
+                toChange.Surname = newSurname == null ? toChange.Surname : newSurname;
+                await context.SaveChangesAsync();
+            }
+
         }
 
         /// <summary>
@@ -62,16 +106,17 @@ namespace ServerApp
         /// </summary>
         /// <param name="teacher">Teacher to add subject to</param>
         /// <param name="subject">Subject to add</param>
-        /// <exception cref="InvalidOperationException">Thrown when tried to add subject that is already in teacher's list</exception>
-        public void AddSubject(Teacher teacher, Subject subject)
+        /// <exception cref="InvalidOperationException"></exception>
+        public async void AddSubject(Teacher teacher, Subject subject)
         {
-            if (teacher.Subjects.Any(s => s.Id == subject.Id))
+            using (var context = new ReporlistContext())
             {
-                throw new InvalidOperationException("There cannot be two equal subjects for the same teacher");
-            }
-            lock (locker)
-            {
-                teacher.Subjects.Add(subject);
+                if (context.SubjectsTeachers.Any(st => st.TeacherId == teacher.Id && st.SubjectId == subject.Id))
+                {
+                    throw new InvalidOperationException("One teacher cannot have two equal subjects");
+                }
+                await context.SubjectsTeachers.AddAsync(new SubjectsTeacher() { SubjectId = subject.Id, TeacherId = teacher.Id });
+                await context.SaveChangesAsync();
             }
         }
 
@@ -80,17 +125,18 @@ namespace ServerApp
         /// </summary>
         /// <param name="teacher">Teacher to remove subject from</param>
         /// <param name="subject">Subject to remove</param>
-        /// <exception cref="InvalidOperationException">Thrown when tried to remove subject that is not in specified teacher's list</exception>
-        public void RemoveSubject(Teacher teacher, Subject subject)
+        /// <exception cref="InvalidOperationException"></exception>
+        public async void RemoveSubject(Teacher teacher, Subject subject)
         {
-            if (!teacher.Subjects.Any(s => s.Id == subject.Id))
+            using (var context = new ReporlistContext())
             {
-                throw new InvalidOperationException("Tried to remove subject that is not in this teacher's list");
-            }
-            lock (locker)
-            {
-                Subject toRemove = teacher.Subjects.First(s => s.Id == subject.Id);
-                teacher.Subjects.Remove(toRemove);
+                if (!context.SubjectsTeachers.Any(st => st.TeacherId == teacher.Id && st.SubjectId == subject.Id))
+                {
+                    throw new InvalidOperationException("Tried to remove subject that is not in this teacher's list");
+                }
+                var toRemove = context.SubjectsTeachers.First(st => st.TeacherId == teacher.Id && st.SubjectId == subject.Id);
+                context.SubjectsTeachers.Remove(toRemove);
+                await context.SaveChangesAsync();
             }
         }
     }
