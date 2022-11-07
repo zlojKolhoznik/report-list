@@ -24,6 +24,16 @@ namespace ServerApp
             }
         }
 
+        public List<Student> GetStudents(Group group)
+        {
+            List<Student> result;
+            using (var context = new ReportlistContext())
+            {
+                result = context.Students.Where(s => s.GroupId == group.Id).ToList();
+            }
+            return result;
+        }
+
         /// <summary>
         /// Removes a student from the database
         /// </summary>
