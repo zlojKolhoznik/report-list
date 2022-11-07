@@ -1,6 +1,10 @@
-﻿using ServerApp;
-using ServerApp.Model;
-using (var context = new ReporlistContext())
+﻿namespace ServerApp
 {
-    
+    internal static class Program
+    {
+        private static void Main(string[] args)
+        {
+            Console.WriteLine();
+        }
+    }
 }

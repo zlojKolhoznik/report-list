@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Networking;
 using Newtonsoft.Json;
+using ServerApp.Model;
 
 namespace ServerApp
 {
@@ -128,7 +129,34 @@ namespace ServerApp
 
         private string LoginUser(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.Login == null || options.Password == null)
+            {
+                var response = new
+                {
+                    success = false,
+                    message = "Either login or password is not provided. Cannot login the user"
+                };
+                return JsonConvert.SerializeObject(response, Formatting.Indented);
+            }
+            AccountManager am = new AccountManager();
+            User? user;
+            try
+            {
+                user = am.GetUser(options.Login);
+            }
+            catch (ArgumentException ex)
+            {
+                var response = new
+                {
+                    success = false,
+                    message = ex.Message
+                };
+                return JsonConvert.SerializeObject(response, Formatting.Indented);
+            }
+            if (user == null)
+            {
+
+            }
         }
 
         private string RegisterUser(RequestOptions options)
