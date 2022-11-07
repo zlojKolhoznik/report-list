@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Networking.ViewModels
+namespace Networking.DataViews
 {
-    public class UserViewModel
+    public class UserDataView
     {
         [JsonProperty("id")]
         public int Id { get; set; }

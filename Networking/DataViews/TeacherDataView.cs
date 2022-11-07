@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Networking.ViewModels
+namespace Networking.DataViews
 {
-    public class StudentViewModel
+    public class TeacherDataView
     {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -18,11 +18,8 @@ namespace Networking.ViewModels
         [JsonProperty("surname")]
         public string Surname { get; set; }
 
-        [JsonProperty("dateOfBirth")]
-        public int DateOfBirth { get; set; }
-
-        [JsonProperty("groupId")]
-        public int GroupId { get; set; }
+        [JsonProperty("subjectsIds")]
+        public List<int> SubjectsIds { get; set; }
 
         [JsonProperty("userId")]
         public int UserId { get; set; }

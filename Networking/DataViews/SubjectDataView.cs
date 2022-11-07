@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Networking.ViewModels
+namespace Networking.DataViews
 {
-    public class SubjectViewModel
+    public class SubjectDataView
     {
     }
 }

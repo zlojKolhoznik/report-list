@@ -1,4 +1,4 @@
-﻿using Networking.ViewModels;
+﻿using Networking.DataViews;
 using Newtonsoft.Json;
 
 namespace Networking
@@ -12,30 +12,30 @@ namespace Networking
         public string? ErrorMessage { get; set; }
 
         [JsonProperty("user")]
-        public UserViewModel? User { get; set; }
+        public UserDataView? User { get; set; }
 
         [JsonProperty("student")]
-        public StudentViewModel? Student { get; set; }
+        public StudentDataView? Student { get; set; }
 
         [JsonProperty("students")]
-        public List<StudentViewModel>? Students { get; set; }
+        public List<StudentDataView>? Students { get; set; }
 
         [JsonProperty("teacher")]
-        public TeacherViewModel? Teacher { get; set; }
+        public TeacherDataView? Teacher { get; set; }
 
         [JsonProperty("groups")]
-        public List<GroupViewModel>? Groups { get; set; }
+        public List<GroupDataView>? Groups { get; set; }
 
         [JsonProperty("homeworks")]
-        public List<HomeworkViewModel>? Homeworks { get; set; }
+        public List<HomeworkDataView>? Homeworks { get; set; }
 
         [JsonProperty("lessons")]
-        public List<LessonViewModel>? Lessons { get; set; }
+        public List<LessonDataView>? Lessons { get; set; }
 
         [JsonProperty("marks")]
-        public List<MarkViewModel>? Marks { get; set; }
+        public List<MarkDataView>? Marks { get; set; }
 
         [JsonProperty("subjects")]
-        public List<SubjectViewModel>? Subjects { get; set; }
+        public List<SubjectDataView>? Subjects { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Networking.ViewModels
+namespace Networking.DataViews
 {
-    public class MarkViewModel
+    public class MarkDataView
     {
     }
 }
