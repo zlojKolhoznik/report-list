@@ -19,7 +19,7 @@ namespace Networking.DataViews
         public string Surname { get; set; }
 
         [JsonProperty("dateOfBirth")]
-        public int DateOfBirth { get; set; }
+        public long DateOfBirth { get; set; }
 
         [JsonProperty("groupId")]
         public int GroupId { get; set; }
