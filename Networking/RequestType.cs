@@ -6,6 +6,7 @@
         Register,
         ChangePassword,
         GetStudent,
+        GetStudents,
         GetTeacher,
         RemoveUser,
         GetGroups,
