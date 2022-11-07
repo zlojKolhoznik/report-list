@@ -75,12 +75,12 @@ namespace ServerApp
         /// Adds a new homework to the database
         /// </summary>
         /// <param name="homework">Homework to add</param>
-        public async void AddHomework(Homework homework)
+        public void AddHomework(Homework homework)
         {
             using (var context = new ReporlistContext())
             {
-                await context.Homeworks.AddAsync(homework);
-                await context.SaveChangesAsync();
+                context.Homeworks.Add(homework);
+                context.SaveChanges();
             }
         }
 
@@ -90,7 +90,7 @@ namespace ServerApp
         /// <remarks>This method will also remove all the marks for this homework. Use wisely</remarks>
         /// <param name="homework">Homework to remove</param>
         /// <exception cref="ArgumentException"></exception>
-        public async void RemoveHomework(Homework homework)
+        public void RemoveHomework(Homework homework)
         {
             using (var context = new ReporlistContext())
             {
@@ -105,7 +105,7 @@ namespace ServerApp
                     mm.RemoveMark(mark);
                 }
                 context.Homeworks.Remove(toRemove);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
@@ -120,7 +120,7 @@ namespace ServerApp
         /// <param name="newFileExtension">Extension of the new file with the task, ignored if null</param>
         /// <param name="newDueDate">New date on which students must do the homework, ignored if null</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public async void ChangeHomeworkInfo(Homework homework, byte[]? newFileBytes = null, string? newFileExtension = null, DateTime? newDueDate = null)
+        public void ChangeHomeworkInfo(Homework homework, byte[]? newFileBytes = null, string? newFileExtension = null, DateTime? newDueDate = null)
         {
             if (newFileBytes == null ^ newFileExtension == null)
             {
@@ -140,9 +140,9 @@ namespace ServerApp
                 toChange.DueDate = newDueDate == null ? toChange.DueDate : (DateTime)newDueDate;
                 toChange.FileExtension = newFileExtension == null ? toChange.FileExtension : newFileExtension;
                 toChange.FileBytes = newFileBytes == null ? toChange.FileBytes : newFileBytes;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
-            
+
         }
     }
 }

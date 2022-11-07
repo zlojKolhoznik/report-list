@@ -29,12 +29,12 @@ namespace ServerApp
         /// Adds a new mark to the database
         /// </summary>
         /// <param name="mark">Mark the method is to add</param>
-        public async void AddMark(Mark mark)
+        public void AddMark(Mark mark)
         {
             using (var context = new ReporlistContext())
             {
-                await context.Marks.AddAsync(mark);
-                await context.SaveChangesAsync();
+                context.Marks.Add(mark);
+                context.SaveChanges();
             }
         }
 
@@ -45,7 +45,7 @@ namespace ServerApp
         /// <param name="newValue">New value of the mark</param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public async void ChangeMark(Mark mark, int newValue)
+        public void ChangeMark(Mark mark, int newValue)
         {
             if (mark.Value == newValue)
             {
@@ -59,7 +59,7 @@ namespace ServerApp
                     throw new ArgumentException("Cannot change the mark that is not in the database", nameof(mark));
                 }
                 mark.Value = newValue;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
@@ -68,7 +68,7 @@ namespace ServerApp
         /// </summary>
         /// <param name="mark">Mark to remove</param>
         /// <exception cref="ArgumentException"></exception>
-        public async void RemoveMark(Mark mark)
+        public void RemoveMark(Mark mark)
         {
             using (var context = new ReporlistContext())
             {
@@ -78,7 +78,7 @@ namespace ServerApp
                     throw new ArgumentException("Cannot remove the mark that is not in the database", nameof(mark));
                 }
                 context.Marks.Remove(mark);
-                await context.SaveChangesAsync();
+                context.SaveChangesAsync();
             }
         }
 

@@ -17,7 +17,7 @@ namespace ServerApp
             var result = new List<Group>();
             foreach (var lesson in subject.Lessons)
             {
-                foreach (var group in lesson.GroupsLessons.Select(gl=>gl.Groups))
+                foreach (var group in lesson.GroupsLessons.Select(gl => gl.Groups))
                 {
                     if (!result.Select(g => g.Id).Contains(group.Id))
                     {
@@ -54,7 +54,7 @@ namespace ServerApp
         /// </summary>
         /// <param name="group">Group to add</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public async void AddGroup(Group group)
+        public void AddGroup(Group group)
         {
             using (var context = new ReporlistContext())
             {
@@ -62,8 +62,8 @@ namespace ServerApp
                 {
                     throw new InvalidOperationException("Group with this name already exists in database");
                 }
-                await context.Groups.AddAsync(group);
-                await context.SaveChangesAsync();
+                context.Groups.Add(group);
+                context.SaveChanges();
             }
         }
 
@@ -74,7 +74,7 @@ namespace ServerApp
         /// <param name="newName">The new name of the group</param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public async void RenameGroup(Group group, string newName)
+        public void RenameGroup(Group group, string newName)
         {
             if (group.Name == newName)
             {
@@ -88,7 +88,7 @@ namespace ServerApp
                     throw new ArgumentException("Cannot rename the group that is not in the database", nameof(group));
                 }
                 toChange.Name = newName;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
@@ -98,7 +98,7 @@ namespace ServerApp
         /// <remarks>This will also remove all the marks, lessons, homeworks and students from this group. Use wisely</remarks>
         /// <param name="group">Group to delete</param>
         /// <exception cref="ArgumentException"></exception>
-        public async void RemoveGroup(Group group)
+        public void RemoveGroup(Group group)
         {
             using (var context = new ReporlistContext())
             {
@@ -108,7 +108,7 @@ namespace ServerApp
                     throw new ArgumentException("Cannot delete the group that is not in the database");
                 }
                 context.Groups.Remove(toRemove);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
     }

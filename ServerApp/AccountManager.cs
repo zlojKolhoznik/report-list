@@ -5,7 +5,7 @@ namespace ServerApp
     /// <summary>
     /// Class that does account-related work
     /// </summary>
-    internal class AccountManager 
+    internal class AccountManager
     {
         /// <summary>
         /// Method that gets the user with specified login
@@ -80,7 +80,7 @@ namespace ServerApp
         /// <param name="user">The user to change password</param>
         /// <param name="newPassword">The new password of the user. Cannot be the same as the current password</param>
         /// <exception cref="InvalidOperationException">Thrown when the new password is equal to the current password</exception>
-        public async void ChangePassword(User user, string newPassword)
+        public void ChangePassword(User user, string newPassword)
         {
             if (user.Password == newPassword)
             {
@@ -94,7 +94,7 @@ namespace ServerApp
                     throw new ArgumentException("Cannot change the password of the user that is not registered");
                 }
                 toChange.Password = newPassword;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 

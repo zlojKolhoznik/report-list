@@ -13,7 +13,7 @@ namespace ServerApp
         public List<Subject> GetSubjects(Group group)
         {
             var result = new List<Subject>();
-            foreach (var lesson in group.GroupsLessons.Select(gl=>gl.Lessons))
+            foreach (var lesson in group.GroupsLessons.Select(gl => gl.Lessons))
             {
                 if (!result.Any(s => s.Id == lesson.SubjectId))
                 {
@@ -28,7 +28,7 @@ namespace ServerApp
         /// </summary>
         /// <param name="subject">Subject to add</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public async void AddSubject(Subject subject)
+        public void AddSubject(Subject subject)
         {
             using (var context = new ReporlistContext())
             {
@@ -36,8 +36,8 @@ namespace ServerApp
                 {
                     throw new InvalidOperationException("Subject with this name already exists in database");
                 }
-                await context.Subjects.AddAsync(subject);
-                await context.SaveChangesAsync();
+                context.Subjects.Add(subject);
+                context.SaveChanges();
             }
         }
 
@@ -47,7 +47,7 @@ namespace ServerApp
         /// <remarks>This method will also remove all marks, homework and lessons from this subject. Use wisely</remarks>
         /// <param name="subject"></param>
         /// <exception cref="ArgumentException"></exception>
-        public async void RemoveSubject(Subject subject)
+        public void RemoveSubject(Subject subject)
         {
             using (var context = new ReporlistContext())
             {
@@ -71,7 +71,7 @@ namespace ServerApp
                     context.SubjectsTeachers.Remove(subjectTeacher);
                 }
                 context.Remove(toRemove);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
@@ -82,7 +82,7 @@ namespace ServerApp
         /// <param name="newName">The new name of the subject</param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public async void RenameSubject(Subject subject, string newName)
+        public void RenameSubject(Subject subject, string newName)
         {
             if (subject.Name == newName)
             {
@@ -96,7 +96,7 @@ namespace ServerApp
                     throw new ArgumentException("Cannot remove the subject that is not in the database", nameof(subject));
                 }
                 context.Subjects.Remove(toRemove);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
     }

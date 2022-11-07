@@ -11,7 +11,7 @@ namespace ServerApp
         /// Adds a new student to the database
         /// </summary>
         /// <param name="student">Student to be added</param>
-        public async void AddStudent(Student student)
+        public void AddStudent(Student student)
         {
             using (var context = new ReporlistContext())
             {
@@ -19,8 +19,8 @@ namespace ServerApp
                 {
                     throw new ArgumentException($"Cannot add this teacher to the database. The user with ID {student.UserId} is already binded to a teacher or a student", nameof(student));
                 }
-                await context.Students.AddAsync(student);
-                await context.SaveChangesAsync();
+                context.Students.Add(student);
+                context.SaveChanges();
             }
         }
 
@@ -30,7 +30,7 @@ namespace ServerApp
         /// <remarks>This method will also remove all the marks and will delete the account of this user. Use wisely</remarks>
         /// <param name="student">A student ro remove</param>
         /// <exception cref="ArgumentException"></exception>
-        public async void RemoveStudent(Student student)
+        public void RemoveStudent(Student student)
         {
             using (var context = new ReporlistContext())
             {
@@ -48,7 +48,7 @@ namespace ServerApp
                 }
                 context.Students.Remove(toRemove);
                 am.RemoveUser(login);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
@@ -60,20 +60,20 @@ namespace ServerApp
         /// <param name="newSurname">New surname of the student, no affect if null</param>
         /// <param name="newGroup">New group of the student, no affect if null</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public async void ChangeStudentData(Student student, string? newName = null, string? newSurname = null, Group? newGroup = null)
+        public void ChangeStudentData(Student student, string? newName = null, string? newSurname = null, Group? newGroup = null)
         {
-                if (student.Name == newName)
-                {
-                    throw new InvalidOperationException("Cannot change name to its current value");
-                }
-                if (student.Surname == newSurname)
-                {
-                    throw new InvalidOperationException("Cannot change surname to its current value");
-                }
-                if (student.Group.Id == newGroup?.Id)
-                {
-                    throw new InvalidOperationException("Cannot change group to its current value");
-                }
+            if (student.Name == newName)
+            {
+                throw new InvalidOperationException("Cannot change name to its current value");
+            }
+            if (student.Surname == newSurname)
+            {
+                throw new InvalidOperationException("Cannot change surname to its current value");
+            }
+            if (student.Group.Id == newGroup?.Id)
+            {
+                throw new InvalidOperationException("Cannot change group to its current value");
+            }
             using (var context = new ReporlistContext())
             {
                 var toChange = context.Students.FirstOrDefault(s => s.Id == student.Id);
@@ -84,7 +84,7 @@ namespace ServerApp
                 toChange.Name = newName == null ? toChange.Name : newName;
                 toChange.Surname = newSurname == null ? toChange.Surname : newSurname;
                 toChange.Group = newGroup == null ? toChange.Group : newGroup;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
     }

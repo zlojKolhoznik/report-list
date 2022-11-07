@@ -8,36 +8,36 @@ namespace ServerApp
         /// Adds a new teacher to the database
         /// </summary>
         /// <remarks>DO NOT include the list of subjects and lessons in the Teacher object</remarks>
-        /// <param name="teacher">Student to be added</param>
-        /// <param name="subjects">Subjects of this teacher</param>
-        public async void AddTeacher(Teacher teacher, List<Subject>? subjects = null)
+        /// <param name = "teacher" > Student to be added</param>
+        /// <param name = "subjects" > Subjects of this teacher</param>
+        public void AddTeacher(Teacher teacher, List<Subject>? subjects = null)
         {
             using (var context = new ReporlistContext())
             {
-                if (context.Teachers.Any(t=>t.UserId==teacher.UserId) || context.Students.Any(s => s.UserId == teacher.UserId))
+                if (context.Teachers.Any(t => t.UserId == teacher.UserId) || context.Students.Any(s => s.UserId == teacher.UserId))
                 {
                     throw new ArgumentException($"Cannot add this teacher to the database. The user with ID {teacher.UserId} is already binded to a teacher or a student", nameof(teacher));
                 }
-                await context.Teachers.AddAsync(teacher);
-                await context.SaveChangesAsync();
+                context.Teachers.Add(teacher);
+                context.SaveChanges();
                 if (subjects == null)
                 {
                     return;
                 }
                 foreach (var subject in subjects)
                 {
-                    await context.SubjectsTeachers.AddAsync(new SubjectsTeacher() { SubjectId = subject.Id, TeacherId = teacher.Id });
+                    context.SubjectsTeachers.Add(new SubjectsTeacher() { SubjectId = subject.Id, TeacherId = teacher.Id });
                 }
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
         /// <summary>
         /// Removes a teacher from the database
         /// </summary>
-        /// <remarks>This method will also remove all the marks, lessons and homeworks that have been set by this teacher and will remove the account of this teacher. Use wisely</remarks>
-        /// <param name="teacher">The teacher to remove</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <remarks>This method will also remove all the marks, lessons and homeworks that have been set by this teacher and will remove the account of this teacher.Use wisely</remarks>
+        /// <param name = "teacher" > The teacher to remove</param>
+        /// <exception cref = "ArgumentException" ></ exception >
         public async void RemoveTeahcer(Teacher teacher)
         {
             using (var context = new ReporlistContext())
@@ -72,11 +72,11 @@ namespace ServerApp
         /// <summary>
         /// Change the data about the specified teacher in the database
         /// </summary>
-        /// <param name="teacher">Student whose data to be changed</param>
-        /// <param name="newName">New name of the teacher, no affect if null</param>
-        /// <param name="newSurname">New surname of the teacher, no affect if null</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name = "teacher" > Student whose data to be changed</param>
+        /// <param name = "newName" > New name of the teacher, no affect if null</param>
+        /// <param name = "newSurname" > New surname of the teacher, no affect if null</param>
+        /// <exception cref = "InvalidOperationException" ></ exception >
+        /// < exception cref="ArgumentException"></exception>
         public async void ChangeTeachertData(Teacher teacher, string? newName = null, string? newSurname = null)
         {
             if (teacher.Name == newName)
@@ -104,9 +104,9 @@ namespace ServerApp
         /// <summary>
         /// Adds the new subject for the specified teacher
         /// </summary>
-        /// <param name="teacher">Teacher to add subject to</param>
-        /// <param name="subject">Subject to add</param>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name = "teacher" > Teacher to add subject to</param>
+        /// <param name = "subject" > Subject to add</param>
+        /// <exception cref = "InvalidOperationException" ></ exception >
         public async void AddSubject(Teacher teacher, Subject subject)
         {
             using (var context = new ReporlistContext())
@@ -123,9 +123,9 @@ namespace ServerApp
         /// <summary>
         /// Removes the specified subject from the specified teacher's list
         /// </summary>
-        /// <param name="teacher">Teacher to remove subject from</param>
-        /// <param name="subject">Subject to remove</param>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name = "teacher" > Teacher to remove subject from</param>
+        /// <param name = "subject" > Subject to remove</param>
+        /// <exception cref = "InvalidOperationException" ></ exception >
         public async void RemoveSubject(Teacher teacher, Subject subject)
         {
             using (var context = new ReporlistContext())

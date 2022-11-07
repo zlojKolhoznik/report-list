@@ -18,7 +18,7 @@ namespace ServerApp
             List<Lesson> result;
             using (var context = new ReporlistContext())
             {
-                result = context.Lessons.Where(l => l.Subject.Id == subject.Id && l.GroupsLessons.Select(gl=>gl.Groups.Id).Contains(group.Id)).ToList();
+                result = context.Lessons.Where(l => l.Subject.Id == subject.Id && l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id)).ToList();
             }
             return result;
         }
@@ -93,18 +93,28 @@ namespace ServerApp
         /// </summary>
         /// <param name="lesson">Lesson to add</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public async void AddLesson(Lesson lesson)
+        public async void AddLesson(Lesson lesson, List<Group> groups)
         {
             using (var context = new ReporlistContext())
             {
-                var lessonsOfGroup = context.GroupsLessons.Where(gl => lesson.GroupsLessons.Any(gl1 => gl1.GroupsId == gl.GroupsId)).Select(gl => gl.Lessons);
-                var lessonsOfTeacher = context.Lessons.Where(l => l.TeacherId == lesson.TeacherId);
-                if (lessonsOfGroup.Any(l=>Math.Abs((lesson.Date-l.Date).Hours) < 2) || lessonsOfTeacher.Any(l => Math.Abs((lesson.Date - l.Date).Hours) < 2))
+                var lessonsOfGroup = new List<Lesson>();
+                foreach (var group in groups)
+                {
+                    lessonsOfGroup.AddRange(context.GroupsLessons.Where(gl => gl.GroupsId == group.Id).Select(gl => gl.Lessons).AsEnumerable());
+                }
+                var lessonsOfTeacher = context.Lessons.Where(l => l.TeacherId == lesson.TeacherId).ToList();
+                if (lessonsOfGroup.Any(l => Math.Abs((lesson.Date - l.Date).Hours) < 1) || lessonsOfTeacher.Any(l => Math.Abs((lesson.Date - l.Date).Hours) < 1))
                 {
                     throw new InvalidOperationException("Cannot add a new lesson if there is a lesson in the database for the same group or the same teacher on the same time");
                 }
-                await context.Lessons.AddAsync(lesson);
-                await context.SaveChangesAsync();
+                context.Lessons.Add(lesson);
+                context.SaveChanges();
+                foreach (var group in groups)
+                {
+                    var groupsLesson = new GroupsLesson() { GroupsId = group.Id, LessonsId = lesson.Id };
+                    context.GroupsLessons.Add(groupsLesson);
+                    context.SaveChanges();
+                }
             }
         }
 
@@ -118,7 +128,7 @@ namespace ServerApp
         /// <param name="newTeacher">New teacher of the lesson, ignored if null</param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public async void ChangeLessonInfo(Lesson lesson, string? newTopic = null, DateTime? newDate = null, Subject? newSubject = null, Teacher? newTeacher = null)
+        public void ChangeLessonInfo(Lesson lesson, string? newTopic = null, DateTime? newDate = null, Subject? newSubject = null, Teacher? newTeacher = null)
         {
             if (lesson.Topic == newTopic)
             {
@@ -147,7 +157,7 @@ namespace ServerApp
                 toChange.Date = newDate == null ? toChange.Date : (DateTime)newDate;
                 toChange.Subject = newSubject == null ? toChange.Subject : newSubject;
                 toChange.Teacher = newTeacher == null ? toChange.Teacher : newTeacher;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 

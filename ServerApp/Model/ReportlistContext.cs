@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace ServerApp.Model
 {
-    public partial class ReporlistContext : DbContext
+    public partial class ReportlistContext : DbContext
     {
-        public ReporlistContext()
+        public ReportlistContext()
         {
         }
 
-        public ReporlistContext(DbContextOptions<ReporlistContext> options)
+        public ReportlistContext(DbContextOptions<ReportlistContext> options)
             : base(options)
         {
         }
