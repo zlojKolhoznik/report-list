@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portianko_Kursova", "Portia
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerApp", "ServerApp\ServerApp.csproj", "{CA6236E7-8057-476B-90ED-CFDEB31909AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Networking", "Networking\Networking.csproj", "{22C64CE3-74CF-4AD4-8DD4-E6036C6209D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CA6236E7-8057-476B-90ED-CFDEB31909AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA6236E7-8057-476B-90ED-CFDEB31909AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA6236E7-8057-476B-90ED-CFDEB31909AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22C64CE3-74CF-4AD4-8DD4-E6036C6209D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22C64CE3-74CF-4AD4-8DD4-E6036C6209D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22C64CE3-74CF-4AD4-8DD4-E6036C6209D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22C64CE3-74CF-4AD4-8DD4-E6036C6209D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
