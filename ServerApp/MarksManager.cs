@@ -17,12 +17,17 @@ namespace ServerApp
         public List<Mark> GetMarks(Group group, Subject? subject = null, Teacher? teacher = null)
         {
             var result = new List<Mark>();
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Marks.Where(s => s.Student.Group.Id == group.Id).ToList();
             }
             result = SelectMarks(result, subject, teacher);
             return result;
+        }
+
+        public List<Mark> GetMarks(Student student)
+        {
+            return student.Marks.ToList();
         }
 
         /// <summary>
@@ -31,7 +36,7 @@ namespace ServerApp
         /// <param name="mark">Mark the method is to add</param>
         public void AddMark(Mark mark)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 context.Marks.Add(mark);
                 context.SaveChanges();
@@ -51,7 +56,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change mark value to its current value");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Marks.FirstOrDefault(m => m.Id == mark.Id);
                 if (toChange == null)
@@ -70,7 +75,7 @@ namespace ServerApp
         /// <exception cref="ArgumentException"></exception>
         public void RemoveMark(Mark mark)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Marks.FirstOrDefault(m => m.Id == mark.Id);
                 if (toRemove == null)

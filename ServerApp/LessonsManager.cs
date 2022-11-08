@@ -16,7 +16,7 @@ namespace ServerApp
         public List<Lesson> GetLessons(Group group, Subject subject)
         {
             List<Lesson> result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Lessons.Where(l => l.Subject.Id == subject.Id && l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id)).ToList();
             }
@@ -32,7 +32,7 @@ namespace ServerApp
         public List<Lesson> GetLessons(Group group, DateTime date)
         {
             List<Lesson> result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Lessons.Where(l => l.Date.Date == date.Date && l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id)).ToList();
             }
@@ -48,7 +48,7 @@ namespace ServerApp
         public List<Lesson> GetLessons(Teacher teacher, Subject subject)
         {
             List<Lesson> result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Lessons.Where(l => l.Subject.Id == subject.Id && l.Teacher.Id == teacher.Id).ToList();
             }
@@ -65,7 +65,7 @@ namespace ServerApp
         public List<Lesson> GetLessons(Teacher teacher, DateTime date)
         {
             List<Lesson> result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Lessons.Where(l => l.Date.Date == date.Date && l.Teacher.Id == teacher.Id).ToList();
             }
@@ -81,7 +81,7 @@ namespace ServerApp
         public List<Lesson> GetLessons(Teacher teacher, Group group)
         {
             List<Lesson> result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Lessons.Where(l => l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id) && l.Teacher.Id == teacher.Id).ToList();
             }
@@ -95,7 +95,7 @@ namespace ServerApp
         /// <exception cref="InvalidOperationException"></exception>
         public async void AddLesson(Lesson lesson, List<Group> groups)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var lessonsOfGroup = new List<Lesson>();
                 foreach (var group in groups)
@@ -146,7 +146,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change teacher to its current value");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Lessons.FirstOrDefault(l => l.Id == lesson.Id);
                 if (toChange == null)
@@ -169,7 +169,7 @@ namespace ServerApp
         /// <exception cref="InvalidOperationException"></exception>
         public void RemoveLesson(Lesson lesson)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Lessons.FirstOrDefault(l => l.Id == lesson.Id);
                 MarksManager mm = new MarksManager();

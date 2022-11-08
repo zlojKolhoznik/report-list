@@ -12,7 +12,7 @@ namespace ServerApp
         /// <param name = "subjects" > Subjects of this teacher</param>
         public void AddTeacher(Teacher teacher, List<Subject>? subjects = null)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (context.Teachers.Any(t => t.UserId == teacher.UserId) || context.Students.Any(s => s.UserId == teacher.UserId))
                 {
@@ -40,7 +40,7 @@ namespace ServerApp
         /// <exception cref = "ArgumentException" ></ exception >
         public async void RemoveTeahcer(Teacher teacher)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Teachers.FirstOrDefault(t => t.Id == teacher.Id);
                 if (toRemove == null)
@@ -87,7 +87,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change surname to its current value");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Teachers.FirstOrDefault(t => t.Id == teacher.Id);
                 if (toChange == null)
@@ -109,7 +109,7 @@ namespace ServerApp
         /// <exception cref = "InvalidOperationException" ></ exception >
         public async void AddSubject(Teacher teacher, Subject subject)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (context.SubjectsTeachers.Any(st => st.TeacherId == teacher.Id && st.SubjectId == subject.Id))
                 {
@@ -128,7 +128,7 @@ namespace ServerApp
         /// <exception cref = "InvalidOperationException" ></ exception >
         public async void RemoveSubject(Teacher teacher, Subject subject)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (!context.SubjectsTeachers.Any(st => st.TeacherId == teacher.Id && st.SubjectId == subject.Id))
                 {

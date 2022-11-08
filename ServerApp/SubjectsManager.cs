@@ -30,7 +30,7 @@ namespace ServerApp
         /// <exception cref="InvalidOperationException"></exception>
         public void AddSubject(Subject subject)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (context.Subjects.Any(s => s.Name == subject.Name))
                 {
@@ -49,7 +49,7 @@ namespace ServerApp
         /// <exception cref="ArgumentException"></exception>
         public void RemoveSubject(Subject subject)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Subjects.FirstOrDefault(t => t.Id == subject.Id);
                 if (toRemove == null)
@@ -88,7 +88,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change the name of the group to the current name");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Subjects.FirstOrDefault(s => s.Id == subject.Id);
                 if (toRemove == null)

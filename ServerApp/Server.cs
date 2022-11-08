@@ -291,7 +291,11 @@ namespace ServerApp
 
         private ResponseOptions GetGroups(RequestOptions options)
         {
-            throw new NotImplementedException();
+            ResponseOptions result;
+            if (options.TeacherId == null && options.SubjectId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No teacher or subject ID provided" };
+            }
         }
 
         private ResponseOptions AddGroup(RequestOptions options)

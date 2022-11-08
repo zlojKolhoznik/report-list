@@ -16,7 +16,7 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Group group, Subject subject)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.SubjectId == subject.Id).ToList();
             }
@@ -32,7 +32,7 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Group group, DateTime dueDate)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.DueDate.Date == dueDate.Date).ToList();
             }
@@ -48,7 +48,7 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Teacher teacher, Group group)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.TeacherId == teacher.Id).ToList();
             }
@@ -64,7 +64,7 @@ namespace ServerApp
         public List<Homework> GetHomeworks(Teacher teacher, Subject subject)
         {
             var result = new List<Homework>();
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 result = context.Homeworks.Where(hw => hw.TeacherId == teacher.Id && hw.SubjectId == subject.Id).ToList();
             }
@@ -77,7 +77,7 @@ namespace ServerApp
         /// <param name="homework">Homework to add</param>
         public void AddHomework(Homework homework)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 context.Homeworks.Add(homework);
                 context.SaveChanges();
@@ -92,7 +92,7 @@ namespace ServerApp
         /// <exception cref="ArgumentException"></exception>
         public void RemoveHomework(Homework homework)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id);
                 MarksManager mm = new MarksManager();
@@ -130,7 +130,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change the due date to its current value");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id);
                 if (toChange == null)

@@ -13,7 +13,7 @@ namespace ServerApp
         /// <param name="student">Student to be added</param>
         public void AddStudent(Student student)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (context.Teachers.Any(t => t.UserId == student.UserId) || context.Students.Any(s => s.UserId == student.UserId))
                 {
@@ -24,14 +24,14 @@ namespace ServerApp
             }
         }
 
+        /// <summary>
+        /// Gets the list of the students who are members of the specified group
+        /// </summary>
+        /// <param name="group">Group to search student for</param>
+        /// <returns>The list of Student objects</returns>
         public List<Student> GetStudents(Group group)
         {
-            List<Student> result;
-            using (var context = new ReportlistContext())
-            {
-                result = context.Students.Where(s => s.GroupId == group.Id).ToList();
-            }
-            return result;
+            return group.Students.ToList();
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace ServerApp
         /// <exception cref="ArgumentException"></exception>
         public void RemoveStudent(Student student)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Students.FirstOrDefault(s => s.Id == student.Id);
                 if (toRemove == null)
@@ -84,7 +84,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change group to its current value");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Students.FirstOrDefault(s => s.Id == student.Id);
                 if (toChange == null)

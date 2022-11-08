@@ -8,6 +8,21 @@ namespace ServerApp
     internal class GroupsManager
     {
         /// <summary>
+        /// Gets the list of groups that study the specified subject
+        /// </summary>
+        /// <param name="subject">The subject to select groups for</param>
+        /// <returns>List of groups that have lessons from the specified subject</returns>
+        public List<Group> GetGroups(Subject subject)
+        {
+            List<Group> result;
+            using (var context = new ReportlistContext())
+            {
+                result = context.Groups.Where(g => g.GroupsLessons.Select(gl => gl.Lessons).Select(l => l.SubjectId).Contains(subject.Id)).ToList();
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Gets the list of groups that are taught by the specified teacher
         /// </summary>
         /// <param name="teacher">Teacher to search groups for</param>
