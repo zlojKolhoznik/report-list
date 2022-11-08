@@ -8,32 +8,12 @@ namespace ServerApp
     internal class GroupsManager
     {
         /// <summary>
-        /// Gets the list of groups that study the specified subject
-        /// </summary>
-        /// <param name="subject">Subject to search groups for</param>
-        /// <returns>List of groups that have lessons of the specified subject</Group></returns>
-        public List<Group> GetGroups(Subject subject)
-        {
-            var result = new List<Group>();
-            foreach (var lesson in subject.Lessons)
-            {
-                foreach (var group in lesson.GroupsLessons.Select(gl => gl.Groups))
-                {
-                    if (!result.Select(g => g.Id).Contains(group.Id))
-                    {
-                        result.Add(group);
-                    }
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Gets the list of groups that are taught by the specified teacher
         /// </summary>
         /// <param name="teacher">Teacher to search groups for</param>
+        /// <param name="subject">This parameter will select only these groups that study specified subject, ignored if null</param>
         /// <returns>List of groups that have lessons with the specified teacher</returns>
-        public List<Group> GetGroups(Teacher teacher)
+        public List<Group> GetGroups(Teacher teacher, Subject? subject = null)
         {
             var result = new List<Group>();
             foreach (var lesson in teacher.Lessons)
@@ -46,6 +26,10 @@ namespace ServerApp
                     }
                 }
             }
+            if (subject != null)
+            {
+                result = result.Where(g => g.GroupsLessons.Select(gl => gl.Lessons).Select(l => l.SubjectId).Contains(subject.Id)).ToList();
+            }
             return result;
         }
 
@@ -56,7 +40,7 @@ namespace ServerApp
         /// <exception cref="InvalidOperationException"></exception>
         public void AddGroup(Group group)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (context.Groups.Any(g => g.Name == group.Name))
                 {
@@ -80,7 +64,7 @@ namespace ServerApp
             {
                 throw new InvalidOperationException("Cannot change the name of the group to the current name");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Groups.FirstOrDefault(g => g.Id == group.Id);
                 if (toChange == null)
@@ -100,7 +84,7 @@ namespace ServerApp
         /// <exception cref="ArgumentException"></exception>
         public void RemoveGroup(Group group)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toRemove = context.Groups.FirstOrDefault(g => g.Id == group.Id);
                 if (toRemove == null)
