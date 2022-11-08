@@ -37,10 +37,10 @@ namespace Networking
         public int? StudId { get; set; }
 
         [JsonProperty("gName")]
-        public string? groupName { get; set; }
+        public string? GroupName { get; set; }
 
         [JsonProperty("hwDueDate")]
-        public int? HomeworkDueDate { get; set; }
+        public long? HomeworkDueDate { get; set; }
 
         [JsonProperty("hwFileExtension")]
         public string? HomeworkFileExtension { get; set; }
@@ -61,7 +61,7 @@ namespace Networking
         public string? StudentSurname { get; set; }
 
         [JsonProperty("stDateOfBirth")]
-        public int? StudentDateOfBirth { get; set; }
+        public long? StudentDateOfBirth { get; set; }
 
         [JsonProperty("isAdmin")]
         public bool? IsAdmin { get; set; }
