@@ -12,11 +12,11 @@ namespace ServerApp
         /// </summary>
         /// <param name="login">Login of the user</param>
         /// <returns>The User object if the user if found in database or null if the user is not found</returns>
-        /// <exception cref="ArgumentException">Thrown when two or more users with login specified found in database</exception>
+        /// <exception cref="ArgumentException"></exception>
         public User? GetUser(string login)
         {
             User? result = null;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 try
                 {
@@ -34,10 +34,10 @@ namespace ServerApp
         /// Method that removes the user from the database
         /// </summary>
         /// <param name="login">Login of the user</param>
-        /// <exception cref="ArgumentException">Thrown when two or more users with login specified found in database</exception>
+        /// <exception cref="ArgumentException"></exception>
         public void RemoveUser(string login)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 try
                 {
@@ -60,10 +60,10 @@ namespace ServerApp
         /// Method that adds the new user to the database
         /// </summary>
         /// <param name="user">The User object to be added</param>
-        /// <exception cref="InvalidOperationException">Thrown when user with such login already exists in database</exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public void RegisterUser(User user)
         {
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 if (context.Users.Where(u => u.Login == user.Login).Any())
                 {
@@ -79,14 +79,15 @@ namespace ServerApp
         /// </summary>
         /// <param name="user">The user to change password</param>
         /// <param name="newPassword">The new password of the user. Cannot be the same as the current password</param>
-        /// <exception cref="InvalidOperationException">Thrown when the new password is equal to the current password</exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public void ChangePassword(User user, string newPassword)
         {
             if (user.Password == newPassword)
             {
                 throw new InvalidOperationException("Cannot change the password to the current password");
             }
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 var toChange = context.Users.FirstOrDefault(u => u.Id == user.Id);
                 if (toChange == null)
@@ -107,7 +108,7 @@ namespace ServerApp
         public Student? GetStudent(User user)
         {
             Student? result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 try
                 {
@@ -130,7 +131,7 @@ namespace ServerApp
         public Teacher? GetTeacher(User user)
         {
             Teacher? result;
-            using (var context = new ReporlistContext())
+            using (var context = new ReportlistContext())
             {
                 try
                 {

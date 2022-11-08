@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Networking;
+using Networking.DataViews;
 using Newtonsoft.Json;
 using ServerApp.Model;
 
@@ -44,13 +45,14 @@ namespace ServerApp
                         SendTcpString("Invalid request. Try again", sender);
                         continue;
                     }
-                    string responseJson = ProcessRequest(options);
+                    ResponseOptions response = ProcessRequest(options);
+                    string responseJson = JsonConvert.SerializeObject(response);
                     SendTcpString(responseJson, sender);
                 }
             } while (nonStop);
         }
 
-        private string ProcessRequest(RequestOptions options)
+        private ResponseOptions ProcessRequest(RequestOptions options)
         {
             switch (options.RequestType)
             {
@@ -122,21 +124,23 @@ namespace ServerApp
                     return AddSubjectTeacher(options);
                 case RequestType.RemoveSubjectTeacher:
                     return RemoveSubjectTeacher(options);
+                case RequestType.GetStudents:
+                    return GetStudents(options);
                 default:
-                    return "Invalid request type. Try again";
+                    return new ResponseOptions() { Success = false, ErrorMessage = "Invalid request type. Try again" };
             }
         }
 
-        private string LoginUser(RequestOptions options)
+        private ResponseOptions GetStudents(RequestOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        private ResponseOptions LoginUser(RequestOptions options)
         {
             if (options.Login == null || options.Password == null)
             {
-                var response = new
-                {
-                    success = false,
-                    message = "Either login or password is not provided. Cannot login the user"
-                };
-                return JsonConvert.SerializeObject(response, Formatting.Indented);
+                return new ResponseOptions() { Success = false, ErrorMessage = "Either login or password is not provided. Cannot login the user" };
             }
             AccountManager am = new AccountManager();
             User? user;
@@ -146,180 +150,281 @@ namespace ServerApp
             }
             catch (ArgumentException ex)
             {
-                var response = new
-                {
-                    success = false,
-                    message = ex.Message
-                };
-                return JsonConvert.SerializeObject(response, Formatting.Indented);
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
             }
             if (user == null)
             {
-
+                return new ResponseOptions() { Success = false, ErrorMessage = "This account is not registered. Check your login information" };
             }
+            if (user.Password != options.Password)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Incorrect password. Check your login information" };
+            }
+            UserDataView udw = new UserDataView() { Id = user.Id, Login = user.Login, Password = user.Password };
+            return new ResponseOptions() { Success = true, User = udw };
         }
 
-        private string RegisterUser(RequestOptions options)
+        private ResponseOptions RegisterUser(RequestOptions options)
+        {
+            if (options.Login == null || options.Password == null || options.IsAdmin == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Either login, password or role is not provided. Cannot register the user" };
+            }
+            AccountManager am = new AccountManager();
+            User? user;
+            try
+            {
+                user = am.GetUser(options.Login);
+            }
+            catch (ArgumentException ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            if (user != null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "This account is already registered. Choose another login" };
+            }
+            am.RegisterUser(new User() { Login = options.Login, Password = options.Password, IsAdmin = (bool)options.IsAdmin });
+            user = am.GetUser(options.Login);
+            UserDataView udw = new UserDataView() { Id = user!.Id, Login = user.Login, Password = user.Password };
+            return new ResponseOptions() { Success = true, User = udw };
+        }
+
+        private ResponseOptions ChangePassword(RequestOptions options)
+        {
+            if (options.Login == null || options.Password == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Either login or password is not provided. Cannot identify the user" };
+            }
+            AccountManager am = new AccountManager();
+            User? user;
+            try
+            {
+                user = am.GetUser(options.Login);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            if (user == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "This account is not registered. Check your login information" };
+            }
+            try
+            {
+                am.ChangePassword(user, options.Password);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
+        }
+
+        private ResponseOptions GetStudent(RequestOptions options)
+        {
+            if (options.UserId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "User id is not provided. Cannot identify the user" };
+            }
+            User? user;
+            using (var context = new ReportlistContext())
+            {
+                user = context.Users.FirstOrDefault(u => u.Id == options.UserId);
+            }
+            if (user == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No user with such id found" };
+            }
+            AccountManager am = new AccountManager();
+            Student? student = am.GetStudent(user);
+            if (student == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No student binded to such user found" };
+            }
+            StudentDataView sdw = new StudentDataView() { Id = student.Id, DateOfBirth = student.DateOfBirth.Ticks, GroupId = student.GroupId, Name = student.Name, Surname = student.Surname, UserId = student.UserId };
+            return new ResponseOptions() { Success = true, Student = sdw };
+        }
+
+        private ResponseOptions GetTeacher(RequestOptions options)
+        {
+            if (options.UserId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "User id is not provided. Cannot identify the user" };
+            }
+            User? user;
+            using (var context = new ReportlistContext())
+            {
+                user = context.Users.FirstOrDefault(u => u.Id == options.UserId);
+            }
+            if (user == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No user with such id found" };
+            }
+            AccountManager am = new AccountManager();
+            Teacher? teacher = am.GetTeacher(user);
+            if (teacher == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No teacher binded to such user found" };
+            }
+            TeacherDataView sdw = new TeacherDataView() { Id = teacher.Id, Name = teacher.Name, Surname = teacher.Surname, UserId = teacher.UserId, SubjectsIds = teacher.SubjectsTeachers.Select(st => st.SubjectId).ToList() };
+            return new ResponseOptions() { Success = true, Teacher = sdw };
+        }
+
+        private ResponseOptions RemoveUser(RequestOptions options)
+        {
+            if (options.Login == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Login is not provided. Cannot identify the user" };
+            }
+            AccountManager am = new AccountManager();
+            try
+            {
+                am.RemoveUser(options.Login);
+            }
+            catch (ArgumentException ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
+        }
+
+        private ResponseOptions GetGroups(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string ChangePassword(RequestOptions options)
+        private ResponseOptions AddGroup(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetStudent(RequestOptions options)
+        private ResponseOptions RenameGroup(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetTeacher(RequestOptions options)
+        private ResponseOptions RemoveGroup(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveUser(RequestOptions options)
+        private ResponseOptions GetHomeworks(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetGroups(RequestOptions options)
+        private ResponseOptions AddHomework(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string AddGroup(RequestOptions options)
+        private ResponseOptions ChangeHomework(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RenameGroup(RequestOptions options)
+        private ResponseOptions RemoveHomework(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveGroup(RequestOptions options)
+        private ResponseOptions GetLessons(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetHomeworks(RequestOptions options)
+        private ResponseOptions AddLesson(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string AddHomework(RequestOptions options)
+        private ResponseOptions ChangeLesson(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string ChangeHomework(RequestOptions options)
+        private ResponseOptions RemoveLesson(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveHomework(RequestOptions options)
+        private ResponseOptions GetMarks(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetLessons(RequestOptions options)
+        private ResponseOptions AddMark(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string AddLesson(RequestOptions options)
+        private ResponseOptions ChangeMark(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string ChangeLesson(RequestOptions options)
+        private ResponseOptions RemoveMark(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveLesson(RequestOptions options)
+        private ResponseOptions AddStudent(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetMarks(RequestOptions options)
+        private ResponseOptions ChangeStudent(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string AddMark(RequestOptions options)
+        private ResponseOptions RemoveStudent(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string ChangeMark(RequestOptions options)
+        private ResponseOptions GetSubjects(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveMark(RequestOptions options)
+        private ResponseOptions AddSubject(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string AddStudent(RequestOptions options)
+        private ResponseOptions ChangeSubject(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string ChangeStudent(RequestOptions options)
+        private ResponseOptions RemoveSubject(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveStudent(RequestOptions options)
+        private ResponseOptions AddTeacher(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string GetSubjects(RequestOptions options)
+        private ResponseOptions ChangeTeacher(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string AddSubject(RequestOptions options)
+        private ResponseOptions RemoveTeacher(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string ChangeSubject(RequestOptions options)
+        private ResponseOptions AddSubjectTeacher(RequestOptions options)
         {
             throw new NotImplementedException();
         }
 
-        private string RemoveSubject(RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string AddTeacher(RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string ChangeTeacher(RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string RemoveTeacher(RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string AddSubjectTeacher(RequestOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string RemoveSubjectTeacher(RequestOptions options)
+        private ResponseOptions RemoveSubjectTeacher(RequestOptions options)
         {
             throw new NotImplementedException();
         }
