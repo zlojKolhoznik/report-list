@@ -1,6 +1,6 @@
 ﻿using ServerApp.Model;
 
-namespace ServerApp
+namespace ServerApp.IO
 {
     /// <summary>
     /// Implements students adding
@@ -93,7 +93,7 @@ namespace ServerApp
                 }
                 toChange.Name = newName == null ? toChange.Name : newName;
                 toChange.Surname = newSurname == null ? toChange.Surname : newSurname;
-                toChange.Group = newGroup == null ? toChange.Group : newGroup;
+                toChange.GroupId = newGroup == null ? toChange.GroupId : newGroup.Id;
                 context.SaveChanges();
             }
         }

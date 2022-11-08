@@ -1,6 +1,6 @@
 ﻿using ServerApp.Model;
 
-namespace ServerApp
+namespace ServerApp.IO
 {
     /// <summary>
     /// Implements adding, getting and changing lessons
@@ -155,8 +155,8 @@ namespace ServerApp
                 }
                 toChange.Topic = newTopic == null ? toChange.Topic : newTopic;
                 toChange.Date = newDate == null ? toChange.Date : (DateTime)newDate;
-                toChange.Subject = newSubject == null ? toChange.Subject : newSubject;
-                toChange.Teacher = newTeacher == null ? toChange.Teacher : newTeacher;
+                toChange.SubjectId = newSubject == null ? toChange.SubjectId : newSubject.Id;
+                toChange.TeacherId = newTeacher == null ? toChange.TeacherId : newTeacher.Id;
                 context.SaveChanges();
             }
         }

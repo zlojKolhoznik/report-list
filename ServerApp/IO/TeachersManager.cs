@@ -1,6 +1,6 @@
 ﻿using ServerApp.Model;
 
-namespace ServerApp
+namespace ServerApp.IO
 {
     internal class TeachersManager
     {

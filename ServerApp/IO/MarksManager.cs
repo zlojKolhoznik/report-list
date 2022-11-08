@@ -1,5 +1,5 @@
 ﻿using ServerApp.Model;
-namespace ServerApp
+namespace ServerApp.IO
 {
     /// <summary>
     /// Implements marks getting and adding

@@ -1,6 +1,6 @@
 ﻿using ServerApp.Model;
 
-namespace ServerApp
+namespace ServerApp.IO
 {
     /// <summary>
     /// Implements adding, getting, removing and changing the information about homeworks
