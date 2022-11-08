@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Networking;
 using Networking.DataViews;
 using Newtonsoft.Json;
@@ -569,27 +570,103 @@ namespace ServerApp
 
         private ResponseOptions RemoveLesson(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.LessonId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Lesson id is not provided" };
+            }
+            Lesson lesson = new Lesson() { Id = (int)options.LessonId };
+            LessonsManager lm = new LessonsManager();
+            try
+            {
+                lm.RemoveLesson(lesson);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions GetMarks(RequestOptions options)
         {
-            throw new NotImplementedException();
+            MarksManager mm = new MarksManager();
+            List<Mark> marks;
+            List<MarkDataView> views;
+            if (options.GroupId != null)
+            {
+                Group group = new Group() { Id = (int)options.GroupId };
+                Subject? subject = options.SubjectId == null ? null : new Subject() { Id = (int)options.SubjectId };
+                Teacher? teacher = options.TeacherId == null ? null : new Teacher() { Id = (int)options.TeacherId };
+                marks = mm.GetMarks(group, subject, teacher);
+            }
+            else if (options.StudId != null)
+            {
+                Student student = new Student() { Id = (int)options.StudId };
+                marks = mm.GetMarks(student);
+            }
+            else
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            views = marks.Select(m => new MarkDataView() { HomeworkId = m.HomeworkId, Id = m.Id, LessonId = m.LessonId, StudentId = m.StudentId, Value = m.Value }).ToList();
+            return new ResponseOptions() { Success = true, Marks = views };
         }
 
         private ResponseOptions AddMark(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if(options.MarkValue == null || options.StudId == null || (options.LessonId == null && options.HomeworkId == null))
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data provided" };
+            }
+            Mark mark = new Mark() { Value = (int)options.MarkValue, StudentId = (int)options.StudId, LessonId = options.LessonId, HomeworkId = options.HomeworkId };
+            MarksManager mm = new MarksManager();
+            try
+            {
+                mm.AddMark(mark);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions ChangeMark(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.MarkValue == null || options.MarkId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data provided" };
+            }
+            Mark mark = new Mark() { Value = (int)options.MarkValue, Id = (int)options.MarkId };
+            MarksManager mm = new MarksManager();
+            try
+            {
+                mm.ChangeMark(mark, (int)options.MarkValue);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveMark(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.MarkId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Mark id is not provided" };
+            }
+            Mark mark = new Mark() { Id = (int)options.MarkId };
+            MarksManager mm = new MarksManager();
+            try
+            {
+                mm.RemoveMark(mark);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions AddStudent(RequestOptions options)
