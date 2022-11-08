@@ -5,9 +5,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using Networking;
 using Networking.DataViews;
 using Newtonsoft.Json;
+using ServerApp.IO;
 using ServerApp.Model;
 
 namespace ServerApp
@@ -133,7 +135,23 @@ namespace ServerApp
 
         private ResponseOptions GetStudents(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.GroupId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Group id is not provided. Cannon identify the group" };
+            }
+            Group? group;
+            using (var context = new ReportlistContext())
+            {
+                group = context.Groups.FirstOrDefault(g => g.Id == options.GroupId);
+            }
+            if (group == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No group with such id found" };
+            }
+            StudentsManager sm = new StudentsManager();
+            List<Student> students = sm.GetStudents(group);
+            List<StudentDataView> views = students.Select(s => new StudentDataView() { Id = s.Id, DateOfBirth = s.DateOfBirth.Ticks, GroupId = s.GroupId, Name = s.Name, Surname = s.Surname, UserId = s.UserId}).ToList();
+            return new ResponseOptions() { Success = true, Students = views };
         }
 
         private ResponseOptions LoginUser(RequestOptions options)
@@ -227,15 +245,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "User id is not provided. Cannot identify the user" };
             }
-            User? user;
-            using (var context = new ReportlistContext())
-            {
-                user = context.Users.FirstOrDefault(u => u.Id == options.UserId);
-            }
-            if (user == null)
-            {
-                return new ResponseOptions() { Success = false, ErrorMessage = "No user with such id found" };
-            }
+            User user = new User() { Id = (int)options.UserId };
             AccountManager am = new AccountManager();
             Student? student = am.GetStudent(user);
             if (student == null)
@@ -252,15 +262,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "User id is not provided. Cannot identify the user" };
             }
-            User? user;
-            using (var context = new ReportlistContext())
-            {
-                user = context.Users.FirstOrDefault(u => u.Id == options.UserId);
-            }
-            if (user == null)
-            {
-                return new ResponseOptions() { Success = false, ErrorMessage = "No user with such id found" };
-            }
+            User user = new User() { Id = (int)options.UserId };
             AccountManager am = new AccountManager();
             Teacher? teacher = am.GetTeacher(user);
             if (teacher == null)
@@ -294,58 +296,275 @@ namespace ServerApp
             ResponseOptions result;
             if (options.TeacherId == null && options.SubjectId == null)
             {
-                return new ResponseOptions() { Success = false, ErrorMessage = "No teacher or subject ID provided" };
+                return new ResponseOptions() { Success = false, ErrorMessage = "No teacher or subject id provided" };
             }
+            if (options.TeacherId != null)
+            {
+                Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+                Subject? subject = options.SubjectId == null ? null : new Subject() { Id = (int)options.SubjectId };
+                GroupsManager gm = new GroupsManager();
+                List<Group> groups = gm.GetGroups(teacher, subject);
+                List<GroupDataView> views = groups.Select(g => new GroupDataView() { Id = g.Id, Name = g.Name }).ToList();
+                result =  new ResponseOptions() { Success = true, Groups = views };
+            }
+            else
+            {
+                Subject subject = new Subject() { Id = (int)options.SubjectId! };
+                GroupsManager gm = new GroupsManager();
+                List<Group> groups = gm.GetGroups(subject);
+                List<GroupDataView> views = groups.Select(g => new GroupDataView() { Id = g.Id, Name = g.Name }).ToList();
+                result = new ResponseOptions() { Success = true, Groups = views };
+            }
+            return result;
+
         }
 
         private ResponseOptions AddGroup(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.GroupName == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "No group name provided. Cannot add a group" };
+            }
+            Group group = new Group() { Name = options.GroupName };
+            GroupsManager gm = new GroupsManager();
+            try
+            {
+                gm.AddGroup(group);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RenameGroup(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.GroupId == null || options.GroupName == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Either group id or name is not provided. Cannot rename the group" };
+            }
+            Group? group = new Group() { Id = (int)options.GroupId };
+            GroupsManager gm = new GroupsManager();
+            try
+            {
+                gm.RenameGroup(group, options.GroupName);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveGroup(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.GroupId == null || options.GroupName == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Either group id or name is not provided. Cannot rename the group" };
+            }
+            Group? group = new Group() { Id = (int)options.GroupId };
+            GroupsManager gm = new GroupsManager();
+            try
+            {
+                gm.RemoveGroup(group);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions GetHomeworks(RequestOptions options)
         {
-            throw new NotImplementedException();
+            HomeworksManager hwm = new HomeworksManager();
+            List<Homework> homeworks;
+            List<HomeworkDataView> views;
+            if (options.GroupId != null && options.SubjectId != null)
+            {
+                Group group = new Group() { Id = (int)options.GroupId };
+                Subject subject = new Subject() { Id = (int)options.SubjectId };
+                homeworks = hwm.GetHomeworks(group, subject);
+            }
+            else if (options.GroupId != null && options.HomeworkDueDate != null)
+            {
+                Group group = new Group() { Id = (int)options.GroupId };
+                DateTime dueDate = new DateTime((long)options.HomeworkDueDate);
+                homeworks = hwm.GetHomeworks(group, dueDate);
+            }
+            else if (options.GroupId != null && options.TeacherId != null)
+            {
+                Group group = new Group() { Id = (int)options.GroupId };
+                Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+                homeworks = hwm.GetHomeworks(teacher, group);
+            }
+            else if (options.TeacherId != null && options.SubjectId != null)
+            {
+                Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+                Subject subject = new Subject() { Id = (int)options.SubjectId };
+                homeworks = hwm.GetHomeworks(teacher, subject);
+            }
+            else
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Required information is not provided" };
+            }
+            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, FileData = Encoding.UTF8.GetString(hw.FileBytes), FileExtension = hw.FileExtension, GroupId = hw.GroupId, TeacherId = hw.TeacherId }).ToList();
+            return new ResponseOptions() { Success = true, Homeworks = views };
         }
 
         private ResponseOptions AddHomework(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.HomeworkDueDate == null || options.HomeworkFileData == null || options.HomeworkFileExtension == null || 
+                options.GroupId == null || options.SubjectId == null || options.TeacherId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all of the required data is provided" };
+            }
+            Homework homework = new Homework()
+            {
+                DueDate = new DateTime((long)options.HomeworkDueDate),
+                FileBytes = Encoding.UTF8.GetBytes(options.HomeworkFileData),
+                FileExtension = options.HomeworkFileExtension,
+                GroupId = (int)options.GroupId,
+                SubjectId = (int)options.SubjectId,
+                TeacherId = (int)options.TeacherId
+            };
+            HomeworksManager hwm = new HomeworksManager();
+            hwm.AddHomework(homework);
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions ChangeHomework(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.HomeworkId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Homework id is not provided" };
+            }
+            Homework homework = new Homework() { Id = (int)options.HomeworkId };
+            HomeworksManager hwm = new HomeworksManager();
+            try
+            {
+                byte[]? bytes = options.HomeworkFileData == null ? null : Encoding.UTF8.GetBytes(options.HomeworkFileData);
+                DateTime? dueDate = options.HomeworkDueDate == null ? null : new DateTime((long)options.HomeworkDueDate);
+                hwm.ChangeHomeworkInfo(homework, bytes, options.HomeworkFileExtension, dueDate);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveHomework(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.HomeworkId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Homeword id is not provided" };
+            }
+            Homework homework = new Homework { Id = (int)options.HomeworkId };
+            HomeworksManager hwm = new HomeworksManager();
+            try
+            {
+                hwm.RemoveHomework(homework);
+            }
+            catch (ArgumentException ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions GetLessons(RequestOptions options)
         {
-            throw new NotImplementedException();
+            LessonsManager lm = new LessonsManager();
+            List<Lesson> lessons;
+            List<LessonDataView> views;
+            if (options.GroupId != null && options.SubjectId != null)
+            {
+                Group group = new Group() { Id = (int)options.GroupId };
+                Subject subject = new Subject() { Id = (int)options.SubjectId };
+                lessons = lm.GetLessons(group, subject);
+            }
+            else if (options.GroupId != null && options.LessonDate != null)
+            {
+                Group group = new Group() { Id = (int)options.GroupId };
+                DateTime date = new DateTime((long)options.LessonDate);
+                lessons = lm.GetLessons(group, date);
+            }
+            else if (options.TeacherId != null && options.SubjectId != null)
+            {
+                Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+                Subject subject = new Subject() { Id = (int)options.SubjectId };
+                lessons = lm.GetLessons(teacher, subject);
+            }
+            else if (options.TeacherId != null && options.LessonDate != null)
+            {
+                Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+                DateTime date = new DateTime((long)options.LessonDate);
+                lessons = lm.GetLessons(teacher, date);
+            }
+            else if (options.TeacherId != null && options.GroupId != null)
+            {
+                Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+                Group group = new Group() { Id = (int)options.GroupId };
+                lessons = lm.GetLessons(teacher, group);
+            }
+            else
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            views = lessons.Select(l => new LessonDataView() { Id = l.Id, SubjectId = l.SubjectId, Date = l.Date.Ticks, TeacherId = l.TeacherId, Topic = l.Topic, GroupsIds = l.GroupsLessons.Select(gl => gl.GroupsId).ToList() }).ToList();
+            return new ResponseOptions() { Success = true, Lessons = views };
         }
 
         private ResponseOptions AddLesson(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.LessonId == null || options.SubjectId == null || options.TeacherId == null || options.LessonGroupsIds == null || 
+                options.LessonTopic == null || options.LessonDate == null || options.LessonGroupsIds.Count <= 0)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            Lesson lesson = new Lesson()
+            {
+                Id = (int)options.LessonId,
+                Date = new DateTime((long)options.LessonDate),
+                SubjectId = (int)options.SubjectId,
+                TeacherId = (int)options.TeacherId,
+                Topic = options.LessonTopic
+            };
+            List<Group> groups = options.LessonGroupsIds.Select(id => new Group() { Id = id }).ToList();
+            LessonsManager lm = new LessonsManager();
+            try
+            {
+                lm.AddLesson(lesson, groups);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions ChangeLesson(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.LessonId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Lesson id is not provided" };
+            }
+            LessonsManager lm = new LessonsManager();
+            Lesson lesson = new Lesson() { Id = (int)options.LessonId };
+            try
+            {
+                DateTime? date = options.LessonDate == null ? null : new DateTime((long)options.LessonDate);
+                Subject? subject = options.SubjectId == null ? null : new Subject() { Id = (int)options.SubjectId };
+                Teacher? teacher = options.TeacherId == null ? null : new Teacher() { Id = (int)options.TeacherId };
+                lm.ChangeLessonInfo(lesson, options.LessonTopic, date, subject, teacher);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveLesson(RequestOptions options)
