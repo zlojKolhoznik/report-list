@@ -90,12 +90,12 @@ namespace ServerApp.IO
             }
             using (var context = new ReportlistContext())
             {
-                var toRemove = context.Subjects.FirstOrDefault(s => s.Id == subject.Id);
-                if (toRemove == null)
+                var toRename = context.Subjects.FirstOrDefault(s => s.Id == subject.Id);
+                if (toRename == null)
                 {
                     throw new ArgumentException("Cannot remove the subject that is not in the database", nameof(subject));
                 }
-                context.Subjects.Remove(toRemove);
+                toRename.Name = newName;
                 context.SaveChanges();
             }
         }
