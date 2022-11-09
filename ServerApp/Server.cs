@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -671,62 +672,238 @@ namespace ServerApp
 
         private ResponseOptions AddStudent(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.StudentName == null || options.StudentSurname == null || options.StudentDateOfBirth == null || options.GroupId == null || options.UserId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data provided" };
+            }
+            Student student = new Student()
+            {
+                Name = options.StudentName,
+                Surname = options.StudentSurname,
+                DateOfBirth = new DateTime((long)options.StudentDateOfBirth),
+                GroupId = (int)options.GroupId,
+                UserId = (int)options.UserId
+            };
+            StudentsManager sm = new StudentsManager();
+            try
+            {
+                sm.AddStudent(student);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions ChangeStudent(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.StudId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Student id is not provided" };
+            }
+            Student student = new Student() { Id = (int)options.StudId };
+            Group? group = options.GroupId == null ? null : new Group() { Id = (int)options.GroupId };
+            StudentsManager tm = new StudentsManager();
+            try
+            {
+                tm.ChangeStudentData(student, options.StudentName, options.StudentSurname, group);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveStudent(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.StudId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Student id is not provided" };
+            }
+            Student student = new Student() { Id = (int)options.StudId };
+            StudentsManager sm = new StudentsManager();
+            try
+            {
+                sm.RemoveStudent(student);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions GetSubjects(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.GroupId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            SubjectsManager sm = new SubjectsManager();
+            List<Subject> marks;
+            List<SubjectDataView> views;
+            Group group = new Group() { Id = (int)options.GroupId };
+            marks = sm.GetSubjects(group);
+            views = marks.Select(s => new SubjectDataView() { Id = s.Id, Name = s.Name }).ToList();
+            return new ResponseOptions() { Success = true, Subjects = views };
+
         }
 
         private ResponseOptions AddSubject(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.SubjectName == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Subject name is not provided" };
+            }
+            Subject subject = new Subject() { Name = options.SubjectName };
+            SubjectsManager sm = new SubjectsManager();
+            try
+            {
+                sm.AddSubject(subject);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions ChangeSubject(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.SubjectId == null || options.SubjectName == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            Subject subject = new Subject() { Id = (int)options.SubjectId };
+            SubjectsManager sm = new SubjectsManager();
+            try
+            {
+                sm.RenameSubject(subject, options.SubjectName);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveSubject(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.SubjectId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Subject id is not provided" };
+            }
+            Subject subject = new Subject() { Id = (int)options.SubjectId };
+            SubjectsManager sm = new SubjectsManager();
+            try
+            {
+                sm.RemoveSubject(subject);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions AddTeacher(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.TeacherName == null || options.TeacherSurname == null || options.TeacherSubjectsIds == null || options.UserId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data provided" };
+            }
+            Teacher teacher = new Teacher() { Name = options.TeacherName, Surname = options.TeacherSurname, UserId = (int)options.UserId };
+            List<Subject> subjects = options.TeacherSubjectsIds.Select(sid => new Subject() { Id = sid }).ToList();
+            TeachersManager tm = new TeachersManager();
+            try
+            {
+                tm.AddTeacher(teacher);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions ChangeTeacher(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.TeacherId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Teacher id is not provided" };
+            }
+            Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+            TeachersManager tm = new TeachersManager();
+            try
+            {
+                tm.ChangeTeacherData(teacher, options.TeacherName, options.TeacherSurname);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveTeacher(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.TeacherId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Teacher id is not provided" };
+            }
+            Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+            TeachersManager tm = new TeachersManager();
+            try
+            {
+                tm.RemoveTeacher(teacher);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions AddSubjectTeacher(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.SubjectId == null || options.TeacherId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+            Subject subject = new Subject() { Id = (int)options.SubjectId };
+            TeachersManager tm = new TeachersManager();
+            try
+            {
+                tm.AddSubject(teacher, subject);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private ResponseOptions RemoveSubjectTeacher(RequestOptions options)
         {
-            throw new NotImplementedException();
+            if (options.SubjectId == null || options.TeacherId == null)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
+            }
+            Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
+            Subject subject = new Subject() { Id = (int)options.SubjectId };
+            TeachersManager tm = new TeachersManager();
+            try
+            {
+                tm.RemoveSubject(teacher, subject);
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
+            }
+            return new ResponseOptions() { Success = true };
         }
 
         private byte[] ReadTcpData(TcpClient receiver)
