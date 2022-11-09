@@ -38,7 +38,7 @@ namespace ServerApp.IO
         /// <remarks>This method will also remove all the marks, lessons and homeworks that have been set by this teacher and will remove the account of this teacher.Use wisely</remarks>
         /// <param name = "teacher" > The teacher to remove</param>
         /// <exception cref = "ArgumentException" ></ exception >
-        public async void RemoveTeahcer(Teacher teacher)
+        public async void RemoveTeacher(Teacher teacher)
         {
             using (var context = new ReportlistContext())
             {
@@ -77,7 +77,7 @@ namespace ServerApp.IO
         /// <param name = "newSurname" > New surname of the teacher, no affect if null</param>
         /// <exception cref = "InvalidOperationException" ></ exception >
         /// < exception cref="ArgumentException"></exception>
-        public async void ChangeTeachertData(Teacher teacher, string? newName = null, string? newSurname = null)
+        public async void ChangeTeacherData(Teacher teacher, string? newName = null, string? newSurname = null)
         {
             if (teacher.Name == newName)
             {
@@ -92,7 +92,7 @@ namespace ServerApp.IO
                 var toChange = context.Teachers.FirstOrDefault(t => t.Id == teacher.Id);
                 if (toChange == null)
                 {
-                    throw new ArgumentException("THe specified teacher is not in the database", nameof(teacher));
+                    throw new ArgumentException("The specified teacher is not in the database", nameof(teacher));
                 }
                 toChange.Name = newName == null ? toChange.Name : newName;
                 toChange.Surname = newSurname == null ? toChange.Surname : newSurname;
