@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portianko_Kursova", "Portianko_Kursova\Portianko_Kursova.csproj", "{5E9B2730-856C-4FDE-868C-89567ACACD12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApp", "ClientApp\ClientApp.csproj", "{5E9B2730-856C-4FDE-868C-89567ACACD12}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerApp", "ServerApp\ServerApp.csproj", "{CA6236E7-8057-476B-90ED-CFDEB31909AD}"
 EndProject
