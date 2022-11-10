@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Networking;
 using Networking.DataViews;
 using Newtonsoft.Json;
@@ -54,6 +47,43 @@ namespace ServerApp
                     SendTcpString(responseJson, sender);
                 }
             } while (nonStop);
+        }
+
+        public ResponseOptions Test(RequestOptions options)
+        {
+            return ProcessRequest(options);
+        }
+
+        private byte[] ReadTcpData(TcpClient receiver)
+        {
+            if (receiver.Available <= 0)
+            {
+                throw new ArgumentException("This TcpClient has no data to read.", nameof(receiver));
+            }
+            byte[] bytes = new byte[receiver.Available];
+            using (var ns = receiver.GetStream())
+            {
+                ns.Read(bytes, 0, receiver.Available);
+            }
+            return bytes;
+        }
+
+        private void SendTcpData(byte[] bytes, TcpClient sender)
+        {
+            using (var ns = sender.GetStream())
+            {
+                ns.Write(bytes, 0, bytes.Length);
+            }
+        }
+
+        private void SendTcpString(string str, TcpClient sender)
+        {
+            SendTcpData(Encoding.UTF8.GetBytes(str), sender);
+        }
+
+        private string ReadTcpString(TcpClient receiver)
+        {
+            return Encoding.UTF8.GetString(ReadTcpData(receiver));
         }
 
         private ResponseOptions ProcessRequest(RequestOptions options)
@@ -904,38 +934,6 @@ namespace ServerApp
                 return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
             }
             return new ResponseOptions() { Success = true };
-        }
-
-        private byte[] ReadTcpData(TcpClient receiver)
-        {
-            if (receiver.Available <= 0)
-            {
-                throw new ArgumentException("This TcpClient has no data to read.", nameof(receiver));
-            }
-            byte[] bytes = new byte[receiver.Available];
-            using (var ns = receiver.GetStream())
-            {
-                ns.Read(bytes, 0, receiver.Available);
-            }
-            return bytes;
-        }
-
-        private void SendTcpData(byte[] bytes, TcpClient sender)
-        {
-            using (var ns = sender.GetStream())
-            {
-                ns.Write(bytes, 0, bytes.Length);
-            }
-        }
-
-        private void SendTcpString(string str, TcpClient sender)
-        {
-            SendTcpData(Encoding.UTF8.GetBytes(str), sender);
-        }
-
-        private string ReadTcpString(TcpClient receiver)
-        {
-            return Encoding.UTF8.GetString(ReadTcpData(receiver));
         }
     }
 }
