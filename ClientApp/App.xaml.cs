@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Windows;
 
@@ -29,5 +30,20 @@ namespace ClientApp
 
         public IPAddress Address { get; set; }
         public int Port { get; set; }
+
+        public byte[] SendRequestAndReceiveResponse(byte[] request)
+        {
+            byte[] result;
+            using (var ns = TcpClient.GetStream())
+            {
+                ns.Write(request, 0, request.Length);
+                while (TcpClient.Available <= 0);
+                result = new byte[TcpClient.Available];
+                ns.Read(result);
+            }
+            tcpClient!.Close();
+            tcpClient = null;
+            return result;
+        }
     }
 }

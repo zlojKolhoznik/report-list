@@ -7,6 +7,7 @@ using Networking.Requests;
 using Newtonsoft.Json;
 using ServerApp.IO;
 using ServerApp.Model;
+using System.Text;
 
 namespace ServerApp
 {
@@ -36,21 +37,29 @@ namespace ServerApp
                 if (tcpListener.Pending())
                 {
                     TcpClient sender = tcpListener.AcceptTcpClient();
-                    Console.WriteLine("Received data");
-                    string requestJson = TcpTools.ReadString(sender);
-                    RequestOptions? options = JsonConvert.DeserializeObject<RequestOptions>(requestJson);
-                    if (options == null)
+                    using (var ns = sender.GetStream())
                     {
-                        var r = new ResponseOptions() { Success = false, ErrorMessage = "Invalid request. Try again" };
-                        string json = JsonConvert.SerializeObject(r);
-                        TcpTools.SendString(json, sender);
-                        continue;
+                        Console.WriteLine("Received data");
+                        byte[] requestBytes = new byte[sender.Available];
+                        byte[] responseBytes;
+                        ns.Read(requestBytes);
+                        string requestJson = Encoding.UTF8.GetString(requestBytes);
+                        RequestOptions? options = JsonConvert.DeserializeObject<RequestOptions>(requestJson);
+                        if (options == null)
+                        {
+                            var r = new ResponseOptions() { Success = false, ErrorMessage = "Invalid request. Try again" };
+                            string json = JsonConvert.SerializeObject(r);
+                            responseBytes = Encoding.UTF8.GetBytes(json);
+                            ns.Write(responseBytes);
+                            continue;
+                        }
+                        ResponseOptions response = ProcessRequest(options);
+                        string responseJson = JsonConvert.SerializeObject(response);
+                        responseBytes = Encoding.UTF8.GetBytes(responseJson);
+                        ns.Write(responseBytes);
+                        sender.Close();
                     }
-                    ResponseOptions response = ProcessRequest(options);
-                    string responseJson = JsonConvert.SerializeObject(response);
-                    TcpTools.SendString(responseJson, sender);
                     Console.WriteLine("Sent data");
-                    sender.Close();
                 }
             } while (nonStop);
         }

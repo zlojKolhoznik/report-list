@@ -1,4 +1,5 @@
 ﻿using ClientApp.Core;
+using ClientApp.MVVM.View;
 using Networking;
 using Networking.NetTools;
 using Networking.Requests;
@@ -54,10 +55,21 @@ namespace ClientApp.MVVM.ViewModel
 				App app = (App)Application.Current;
 				app.Address = IPAddressTools.GetLocalIP();
 				app.Port = 20;
-				TcpTools.SendString(json, app.TcpClient);
-				json = TcpTools.ReadString(app.TcpClient);
+				byte[] responseBytes = app.SendRequestAndReceiveResponse(request);
+				json = Encoding.UTF8.GetString(responseBytes);
 				ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-				ErrorMessage = response.Success.ToString();
+				if (response.Success)
+				{
+					Window window = new MainWindow();
+					window.Show();
+					Window toClose = app.MainWindow;
+					app.MainWindow = window;
+					toClose.Close();
+				}
+				else
+				{
+					ErrorMessage = response.ErrorMessage;
+				}
 			});
 			set
 			{
