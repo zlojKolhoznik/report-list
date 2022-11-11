@@ -13,13 +13,10 @@ namespace Networking.NetTools
         /// <exception cref="ArgumentException"></exception>
         public static byte[] ReadBytes(TcpClient receiver)
         {
-            if (receiver.Available <= 0)
-            {
-                throw new ArgumentException("This TcpClient has no data to read.", nameof(receiver));
-            }
-            byte[] bytes = new byte[receiver.Available];
+            byte[] bytes;
             using (var ns = receiver.GetStream())
             {
+                bytes = new byte[ns.Length];
                 ns.Read(bytes, 0, receiver.Available);
             }
             return bytes;

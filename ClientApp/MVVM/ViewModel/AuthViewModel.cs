@@ -4,6 +4,7 @@ using Networking.NetTools;
 using Networking.Requests;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -51,12 +52,12 @@ namespace ClientApp.MVVM.ViewModel
 				string json = JsonConvert.SerializeObject(options);
 				byte[] request = Encoding.UTF8.GetBytes(json);
 				App app = (App)Application.Current;
-				if (app.TcpClient == null)
-				{
-					app.BindTcpClient(IPAddress.Parse("192.168.0.1"), 20); // Hard binding to the server IP-Address due to not having the own HTTPS domain
-				}
-				TcpTools.SendString(json, app.TcpClient!);
-				json = Encoding.UTF8.GetString(request);
+				app.Address = IPAddressTools.GetLocalIP();
+				app.Port = 20;
+				TcpTools.SendString(json, app.TcpClient);
+				json = TcpTools.ReadString(app.TcpClient);
+				ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+				ErrorMessage = response.Success.ToString();
 			});
 			set
 			{

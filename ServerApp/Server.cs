@@ -36,6 +36,7 @@ namespace ServerApp
                 if (tcpListener.Pending())
                 {
                     TcpClient sender = tcpListener.AcceptTcpClient();
+                    Console.WriteLine("Received data");
                     string requestJson = TcpTools.ReadString(sender);
                     RequestOptions? options = JsonConvert.DeserializeObject<RequestOptions>(requestJson);
                     if (options == null)
@@ -48,6 +49,8 @@ namespace ServerApp
                     ResponseOptions response = ProcessRequest(options);
                     string responseJson = JsonConvert.SerializeObject(response);
                     TcpTools.SendString(responseJson, sender);
+                    Console.WriteLine("Sent data");
+                    sender.Close();
                 }
             } while (nonStop);
         }
