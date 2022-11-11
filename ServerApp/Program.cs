@@ -1,16 +1,10 @@
-﻿using Networking;
-using Networking.Requests;
-using Newtonsoft.Json;
+﻿using Networking.NetTools;
+using ServerApp;
 using System.Net;
-using System.Text;
 
-namespace ServerApp
-{
-    internal static class Program
-    {
-        private static void Main(string[] args)
-        {
-            
-        }
-    }
-}
+IPAddress localAddress = IPAddressTools.GetLocalIP();
+int localPort = 20;
+Server server = new Server(localAddress, localPort);
+Task.Run(() => server.Run());
+Console.WriteLine($"The server is listening on port {localPort}. To stop the server, either press Enter or Ctrl+C");
+Console.ReadLine();
