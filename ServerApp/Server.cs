@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using Networking;
+using Networking.NetTools;
 using Networking.DataViews;
 using Networking.Requests;
 using Newtonsoft.Json;
@@ -36,11 +36,11 @@ namespace ServerApp
                 if (tcpListener.Pending())
                 {
                     TcpClient sender = tcpListener.AcceptTcpClient();
-                    string requestJson = ReadTcpString(sender);
+                    string requestJson = TcpTools.ReadString(sender);
                     RequestOptions? options = JsonConvert.DeserializeObject<RequestOptions>(requestJson);
                     if (options == null)
                     {
-                        SendTcpString("Invalid request. Try again", sender);
+                        TcpTools.SendString("Invalid request. Try again", sender);
                         continue;
                     }
                     ResponseOptions response = ProcessRequest(options);
@@ -48,38 +48,6 @@ namespace ServerApp
                     SendTcpString(responseJson, sender);
                 }
             } while (nonStop);
-        }
-
-        private byte[] ReadTcpBytes(TcpClient receiver)
-        {
-            if (receiver.Available <= 0)
-            {
-                throw new ArgumentException("This TcpClient has no data to read.", nameof(receiver));
-            }
-            byte[] bytes = new byte[receiver.Available];
-            using (var ns = receiver.GetStream())
-            {
-                ns.Read(bytes, 0, receiver.Available);
-            }
-            return bytes;
-        }
-
-        private void SendTcpBytes(byte[] bytes, TcpClient sender)
-        {
-            using (var ns = sender.GetStream())
-            {
-                ns.Write(bytes, 0, bytes.Length);
-            }
-        }
-
-        private void SendTcpString(string str, TcpClient sender)
-        {
-            SendTcpBytes(Encoding.UTF8.GetBytes(str), sender);
-        }
-
-        private string ReadTcpString(TcpClient receiver)
-        {
-            return Encoding.UTF8.GetString(ReadTcpBytes(receiver));
         }
 
         private ResponseOptions ProcessRequest(RequestOptions options)
