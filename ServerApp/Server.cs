@@ -40,12 +40,14 @@ namespace ServerApp
                     RequestOptions? options = JsonConvert.DeserializeObject<RequestOptions>(requestJson);
                     if (options == null)
                     {
-                        TcpTools.SendString("Invalid request. Try again", sender);
+                        var r = new ResponseOptions() { Success = false, ErrorMessage = "Invalid request. Try again" };
+                        string json = JsonConvert.SerializeObject(r);
+                        TcpTools.SendString(json, sender);
                         continue;
                     }
                     ResponseOptions response = ProcessRequest(options);
                     string responseJson = JsonConvert.SerializeObject(response);
-                    SendTcpString(responseJson, sender);
+                    TcpTools.SendString(responseJson, sender);
                 }
             } while (nonStop);
         }
