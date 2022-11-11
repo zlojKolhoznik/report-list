@@ -1,7 +1,9 @@
 ﻿using ClientApp.Core;
 using Networking;
+using Networking.NetTools;
 using Networking.Requests;
 using Newtonsoft.Json;
+using System.Net;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,19 +12,19 @@ namespace ClientApp.MVVM.ViewModel
 {
     internal class AuthViewModel : ObservableObject
     {
-		private string login;
+		private string username;
 		private string errorMessage = "";
 		private RelayCommand? logIn;
 
-		public string Login
+		public string Username
         {
-            get => login;
+            get => username;
             set
 			{
-				if (login != value)
+				if (username != value)
 				{
-					login = value;
-					OnPropertyChanged(nameof(Login));
+					username = value;
+					OnPropertyChanged(nameof(Username));
 				}
 			}
         }
@@ -45,10 +47,16 @@ namespace ClientApp.MVVM.ViewModel
 			get => logIn ??= new RelayCommand((param) =>
 			{
 				string password = (param as PasswordBox)!.Password;
-				RequestOptions options = new RequestOptions() { RequestType = RequestType.LogIn, Login = Login, Password = password };
+				RequestOptions options = new RequestOptions() { RequestType = RequestType.LogIn, Login = Username, Password = password };
 				string json = JsonConvert.SerializeObject(options);
 				byte[] request = Encoding.UTF8.GetBytes(json);
-				ErrorMessage = Application.Current.GetType().IsAssignableTo(typeof(App)).ToString();
+				App app = (App)Application.Current;
+				if (app.TcpClient == null)
+				{
+					app.BindTcpClient(IPAddress.Parse("192.168.0.1"), 20); // Hard binding to the server IP-Address due to not having the own HTTPS domain
+				}
+				TcpTools.SendString(json, app.TcpClient!);
+				json = Encoding.UTF8.GetString(request);
 			});
 			set
 			{
