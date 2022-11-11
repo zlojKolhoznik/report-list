@@ -1,4 +1,5 @@
 ﻿using ServerApp.Model;
+using Microsoft.EntityFrameworkCore;
 namespace ServerApp.IO
 {
     /// <summary>
@@ -19,7 +20,11 @@ namespace ServerApp.IO
             var result = new List<Mark>();
             using (var context = new ReportlistContext())
             {
-                result = context.Marks.Where(s => s.Student.Group.Id == group.Id).ToList();
+                result = context.Marks.Include(m => m.Student)
+                                      .Include(m => m.Homework)
+                                      .Include(m => m.Lesson)
+                                      .Where(m => m.Student.GroupId == group.Id)
+                                      .ToList();
             }
             result = SelectMarks(result, subject, teacher);
             return result;
@@ -27,7 +32,12 @@ namespace ServerApp.IO
 
         public List<Mark> GetMarks(Student student)
         {
-            return student.Marks.ToList();
+            List<Mark> result = new List<Mark>();
+            using (var context = new ReportlistContext())
+            {
+                result = context.Marks.Where(m => m.StudentId == student.Id).ToList();
+            }
+            return result;
         }
 
         /// <summary>
@@ -52,10 +62,6 @@ namespace ServerApp.IO
         /// <exception cref="ArgumentException"></exception>
         public void ChangeMark(Mark mark, int newValue)
         {
-            if (mark.Value == newValue)
-            {
-                throw new InvalidOperationException("Cannot change mark value to its current value");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Marks.FirstOrDefault(m => m.Id == mark.Id);
@@ -63,7 +69,11 @@ namespace ServerApp.IO
                 {
                     throw new ArgumentException("Cannot change the mark that is not in the database", nameof(mark));
                 }
-                mark.Value = newValue;
+                if (toChange.Value == newValue)
+                {
+                    throw new InvalidOperationException("Cannot change mark value to its current value");
+                }
+                toChange.Value = newValue;
                 context.SaveChanges();
             }
         }
@@ -82,8 +92,8 @@ namespace ServerApp.IO
                 {
                     throw new ArgumentException("Cannot remove the mark that is not in the database", nameof(mark));
                 }
-                context.Marks.Remove(mark);
-                context.SaveChangesAsync();
+                context.Marks.Remove(toRemove);
+                context.SaveChanges();
             }
         }
 

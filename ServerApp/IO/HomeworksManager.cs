@@ -126,16 +126,16 @@ namespace ServerApp.IO
             {
                 throw new InvalidOperationException("Cannot change the file without changing the extension and cannot change the extension without changing the file");
             }
-            if (newDueDate == homework.DueDate)
-            {
-                throw new InvalidOperationException("Cannot change the due date to its current value");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id);
                 if (toChange == null)
                 {
                     throw new ArgumentException("Cannot change the homework that is not in the database", nameof(homework));
+                }
+                if (newDueDate == toChange.DueDate)
+                {
+                    throw new InvalidOperationException("Cannot change the due date to its current value");
                 }
                 toChange.DueDate = newDueDate == null ? toChange.DueDate : (DateTime)newDueDate;
                 toChange.FileExtension = newFileExtension == null ? toChange.FileExtension : newFileExtension;

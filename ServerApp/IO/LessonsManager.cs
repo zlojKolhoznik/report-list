@@ -1,4 +1,5 @@
-﻿using ServerApp.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerApp.Model;
 
 namespace ServerApp.IO
 {
@@ -18,7 +19,9 @@ namespace ServerApp.IO
             List<Lesson> result;
             using (var context = new ReportlistContext())
             {
-                result = context.Lessons.Where(l => l.Subject.Id == subject.Id && l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id)).ToList();
+                result = context.Lessons.Include(l => l.GroupsLessons)
+                                        .Where(l => l.SubjectId == subject.Id && l.GroupsLessons.Select(gl => gl.GroupsId).Contains(group.Id))
+                                        .ToList();
             }
             return result;
         }
@@ -34,7 +37,9 @@ namespace ServerApp.IO
             List<Lesson> result;
             using (var context = new ReportlistContext())
             {
-                result = context.Lessons.Where(l => l.Date.Date == date.Date && l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id)).ToList();
+                result = context.Lessons.Include(l => l.GroupsLessons)
+                                        .Where(l => l.Date.Date == date.Date && l.GroupsLessons.Select(gl => gl.GroupsId).Contains(group.Id))
+                                        .ToList();
             }
             return result;
         }
@@ -50,7 +55,7 @@ namespace ServerApp.IO
             List<Lesson> result;
             using (var context = new ReportlistContext())
             {
-                result = context.Lessons.Where(l => l.Subject.Id == subject.Id && l.Teacher.Id == teacher.Id).ToList();
+                result = context.Lessons.Where(l => l.SubjectId == subject.Id && l.TeacherId == teacher.Id).ToList();
             }
             return result;
         }
@@ -67,7 +72,7 @@ namespace ServerApp.IO
             List<Lesson> result;
             using (var context = new ReportlistContext())
             {
-                result = context.Lessons.Where(l => l.Date.Date == date.Date && l.Teacher.Id == teacher.Id).ToList();
+                result = context.Lessons.Where(l => l.Date.Date == date.Date && l.TeacherId == teacher.Id).ToList();
             }
             return result;
         }
@@ -83,7 +88,10 @@ namespace ServerApp.IO
             List<Lesson> result;
             using (var context = new ReportlistContext())
             {
-                result = context.Lessons.Where(l => l.GroupsLessons.Select(gl => gl.Groups.Id).Contains(group.Id) && l.Teacher.Id == teacher.Id).ToList();
+                result = context.Lessons.Include(l => l.GroupsLessons)
+                                        .Where(l => l.GroupsLessons.Select(gl => gl.GroupsId)
+                                        .Contains(group.Id) && l.TeacherId == teacher.Id)
+                                        .ToList();
             }
             return result;
         }
@@ -130,28 +138,28 @@ namespace ServerApp.IO
         /// <exception cref="ArgumentException"></exception>
         public void ChangeLessonInfo(Lesson lesson, string? newTopic = null, DateTime? newDate = null, Subject? newSubject = null, Teacher? newTeacher = null)
         {
-            if (lesson.Topic == newTopic)
-            {
-                throw new InvalidOperationException("Cannot change topic to its current value");
-            }
-            if (lesson.Date == newDate)
-            {
-                throw new InvalidOperationException("Cannot change date to its current value");
-            }
-            if (lesson.Subject == newSubject)
-            {
-                throw new InvalidOperationException("Cannot change subject to its current value");
-            }
-            if (lesson.Teacher == newTeacher)
-            {
-                throw new InvalidOperationException("Cannot change teacher to its current value");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Lessons.FirstOrDefault(l => l.Id == lesson.Id);
                 if (toChange == null)
                 {
                     throw new ArgumentException("Cannot change the lesson than is not in the database", nameof(lesson));
+                }
+                if (toChange.Topic == newTopic)
+                {
+                    throw new InvalidOperationException("Cannot change topic to its current value");
+                }
+                if (toChange.Date == newDate)
+                {
+                    throw new InvalidOperationException("Cannot change date to its current value");
+                }
+                if (toChange.SubjectId == newSubject?.Id)
+                {
+                    throw new InvalidOperationException("Cannot change subject to its current value");
+                }
+                if (toChange.TeacherId == newTeacher?.Id)
+                {
+                    throw new InvalidOperationException("Cannot change teacher to its current value");
                 }
                 toChange.Topic = newTopic == null ? toChange.Topic : newTopic;
                 toChange.Date = newDate == null ? toChange.Date : (DateTime)newDate;

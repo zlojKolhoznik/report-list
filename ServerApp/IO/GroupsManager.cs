@@ -1,4 +1,5 @@
-﻿using ServerApp.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerApp.Model;
 
 namespace ServerApp.IO
 {
@@ -30,16 +31,14 @@ namespace ServerApp.IO
         /// <returns>List of groups that have lessons with the specified teacher</returns>
         public List<Group> GetGroups(Teacher teacher, Subject? subject = null)
         {
-            var result = new List<Group>();
-            foreach (var lesson in teacher.Lessons)
+            List<Group> result;
+            using (var context = new ReportlistContext())
             {
-                foreach (var group in lesson.GroupsLessons.Select(gl => gl.Groups))
-                {
-                    if (!result.Select(g => g.Id).Contains(group.Id))
-                    {
-                        result.Add(group);
-                    }
-                }
+                result = context.Groups.
+                    Include(g => g.GroupsLessons).
+                    ThenInclude(gl => gl.Lessons).
+                    Where(g => g.GroupsLessons.Any(gl => gl.Lessons.TeacherId == teacher.Id)).
+                    ToList();
             }
             if (subject != null)
             {
@@ -75,16 +74,16 @@ namespace ServerApp.IO
         /// <exception cref="ArgumentException"></exception>
         public void RenameGroup(Group group, string newName)
         {
-            if (group.Name == newName)
-            {
-                throw new InvalidOperationException("Cannot change the name of the group to the current name");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Groups.FirstOrDefault(g => g.Id == group.Id);
                 if (toChange == null)
                 {
                     throw new ArgumentException("Cannot rename the group that is not in the database", nameof(group));
+                }
+                if (toChange.Name == newName)
+                {
+                    throw new InvalidOperationException("Cannot change the name of the group to the current name");
                 }
                 toChange.Name = newName;
                 context.SaveChanges();

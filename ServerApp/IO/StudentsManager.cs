@@ -31,7 +31,12 @@ namespace ServerApp.IO
         /// <returns>The list of Student objects</returns>
         public List<Student> GetStudents(Group group)
         {
-            return group.Students.ToList();
+            List<Student> result = new List<Student>();
+            using (var context = new ReportlistContext())
+            {
+                result = context.Students.Where(s => s.GroupId == group.Id).ToList();
+            }
+            return result;
         }
 
         /// <summary>
@@ -72,24 +77,24 @@ namespace ServerApp.IO
         /// <exception cref="InvalidOperationException"></exception>
         public void ChangeStudentData(Student student, string? newName = null, string? newSurname = null, Group? newGroup = null)
         {
-            if (student.Name == newName)
-            {
-                throw new InvalidOperationException("Cannot change name to its current value");
-            }
-            if (student.Surname == newSurname)
-            {
-                throw new InvalidOperationException("Cannot change surname to its current value");
-            }
-            if (student.Group.Id == newGroup?.Id)
-            {
-                throw new InvalidOperationException("Cannot change group to its current value");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Students.FirstOrDefault(s => s.Id == student.Id);
                 if (toChange == null)
                 {
                     throw new ArgumentException("Cannot change information about the students who is not in the database");
+                }
+                if (toChange.Name == newName)
+                {
+                    throw new InvalidOperationException("Cannot change name to its current value");
+                }
+                if (toChange.Surname == newSurname)
+                {
+                    throw new InvalidOperationException("Cannot change surname to its current value");
+                }
+                if (toChange.GroupId == newGroup?.Id)
+                {
+                    throw new InvalidOperationException("Cannot change group to its current value");
                 }
                 toChange.Name = newName == null ? toChange.Name : newName;
                 toChange.Surname = newSurname == null ? toChange.Surname : newSurname;

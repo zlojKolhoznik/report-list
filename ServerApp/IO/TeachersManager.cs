@@ -20,7 +20,7 @@ namespace ServerApp.IO
                 }
                 context.Teachers.Add(teacher);
                 context.SaveChanges();
-                if (subjects == null)
+                if (subjects == null || subjects.Count < 1)
                 {
                     return;
                 }
@@ -38,7 +38,7 @@ namespace ServerApp.IO
         /// <remarks>This method will also remove all the marks, lessons and homeworks that have been set by this teacher and will remove the account of this teacher.Use wisely</remarks>
         /// <param name = "teacher" > The teacher to remove</param>
         /// <exception cref = "ArgumentException" ></ exception >
-        public async void RemoveTeacher(Teacher teacher)
+        public void RemoveTeacher(Teacher teacher)
         {
             using (var context = new ReportlistContext())
             {
@@ -65,7 +65,7 @@ namespace ServerApp.IO
                 }
                 context.Remove(toRemove);
                 am.RemoveUser(login);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
 
@@ -77,16 +77,8 @@ namespace ServerApp.IO
         /// <param name = "newSurname" > New surname of the teacher, no affect if null</param>
         /// <exception cref = "InvalidOperationException" ></ exception >
         /// < exception cref="ArgumentException"></exception>
-        public async void ChangeTeacherData(Teacher teacher, string? newName = null, string? newSurname = null)
+        public void ChangeTeacherData(Teacher teacher, string? newName = null, string? newSurname = null)
         {
-            if (teacher.Name == newName)
-            {
-                throw new InvalidOperationException("Cannot change name to its current value");
-            }
-            if (teacher.Surname == newSurname)
-            {
-                throw new InvalidOperationException("Cannot change surname to its current value");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Teachers.FirstOrDefault(t => t.Id == teacher.Id);
@@ -94,9 +86,17 @@ namespace ServerApp.IO
                 {
                     throw new ArgumentException("The specified teacher is not in the database", nameof(teacher));
                 }
+                if (toChange.Name == newName)
+                {
+                    throw new InvalidOperationException("Cannot change name to its current value");
+                }
+                if (toChange.Surname == newSurname)
+                {
+                    throw new InvalidOperationException("Cannot change surname to its current value");
+                }
                 toChange.Name = newName == null ? toChange.Name : newName;
                 toChange.Surname = newSurname == null ? toChange.Surname : newSurname;
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
 
         }
@@ -107,7 +107,7 @@ namespace ServerApp.IO
         /// <param name = "teacher" > Teacher to add subject to</param>
         /// <param name = "subject" > Subject to add</param>
         /// <exception cref = "InvalidOperationException" ></ exception >
-        public async void AddSubject(Teacher teacher, Subject subject)
+        public void AddSubject(Teacher teacher, Subject subject)
         {
             using (var context = new ReportlistContext())
             {
@@ -115,8 +115,8 @@ namespace ServerApp.IO
                 {
                     throw new InvalidOperationException("One teacher cannot have two equal subjects");
                 }
-                await context.SubjectsTeachers.AddAsync(new SubjectsTeacher() { SubjectId = subject.Id, TeacherId = teacher.Id });
-                await context.SaveChangesAsync();
+                context.SubjectsTeachers.Add(new SubjectsTeacher() { SubjectId = subject.Id, TeacherId = teacher.Id });
+                context.SaveChanges();
             }
         }
 
@@ -126,7 +126,7 @@ namespace ServerApp.IO
         /// <param name = "teacher" > Teacher to remove subject from</param>
         /// <param name = "subject" > Subject to remove</param>
         /// <exception cref = "InvalidOperationException" ></ exception >
-        public async void RemoveSubject(Teacher teacher, Subject subject)
+        public void RemoveSubject(Teacher teacher, Subject subject)
         {
             using (var context = new ReportlistContext())
             {
@@ -136,7 +136,7 @@ namespace ServerApp.IO
                 }
                 var toRemove = context.SubjectsTeachers.First(st => st.TeacherId == teacher.Id && st.SubjectId == subject.Id);
                 context.SubjectsTeachers.Remove(toRemove);
-                await context.SaveChangesAsync();
+                context.SaveChanges();
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using ServerApp.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerApp.Model;
 
 namespace ServerApp.IO
 {
@@ -13,12 +14,11 @@ namespace ServerApp.IO
         public List<Subject> GetSubjects(Group group)
         {
             var result = new List<Subject>();
-            foreach (var lesson in group.GroupsLessons.Select(gl => gl.Lessons))
+            using (var context = new ReportlistContext())
             {
-                if (!result.Any(s => s.Id == lesson.SubjectId))
-                {
-                    result.Add(lesson.Subject);
-                }
+                result = context.Subjects.Include(s => s.Lessons).ThenInclude(l => l.GroupsLessons)
+                                         .Where(s => s.Lessons.Any(l => l.GroupsLessons.Any(gl => gl.GroupsId == group.Id)))
+                                         .ToList();
             }
             return result;
         }
@@ -54,7 +54,7 @@ namespace ServerApp.IO
                 var toRemove = context.Subjects.FirstOrDefault(t => t.Id == subject.Id);
                 if (toRemove == null)
                 {
-                    throw new ArgumentException("Cannot remove the teacehr who is not in the database", nameof(subject));
+                    throw new ArgumentException("Cannot remove the subject that is not in the database", nameof(subject));
                 }
                 HomeworksManager hwm = new HomeworksManager();
                 LessonsManager lm = new LessonsManager();
@@ -84,16 +84,16 @@ namespace ServerApp.IO
         /// <exception cref="ArgumentException"></exception>
         public void RenameSubject(Subject subject, string newName)
         {
-            if (subject.Name == newName)
-            {
-                throw new InvalidOperationException("Cannot change the name of the group to the current name");
-            }
             using (var context = new ReportlistContext())
             {
                 var toRename = context.Subjects.FirstOrDefault(s => s.Id == subject.Id);
                 if (toRename == null)
                 {
                     throw new ArgumentException("Cannot remove the subject that is not in the database", nameof(subject));
+                }
+                if (toRename.Name == newName)
+                {
+                    throw new InvalidOperationException("Cannot change the name of the group to the current name");
                 }
                 toRename.Name = newName;
                 context.SaveChanges();

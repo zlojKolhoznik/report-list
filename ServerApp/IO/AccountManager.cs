@@ -1,4 +1,5 @@
-﻿using ServerApp.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerApp.Model;
 
 namespace ServerApp.IO
 {
@@ -83,16 +84,16 @@ namespace ServerApp.IO
         /// <exception cref="ArgumentException"></exception>
         public void ChangePassword(User user, string newPassword)
         {
-            if (user.Password == newPassword)
-            {
-                throw new InvalidOperationException("Cannot change the password to the current password");
-            }
             using (var context = new ReportlistContext())
             {
                 var toChange = context.Users.FirstOrDefault(u => u.Id == user.Id);
                 if (toChange == null)
                 {
                     throw new ArgumentException("Cannot change the password of the user that is not registered");
+                }
+                if (toChange.Password == newPassword)
+                {
+                    throw new InvalidOperationException("Cannot change the password to the current password");
                 }
                 toChange.Password = newPassword;
                 context.SaveChanges();
@@ -112,7 +113,7 @@ namespace ServerApp.IO
             {
                 try
                 {
-                    result = context.Students.Where(s => s.User.Id == user.Id).SingleOrDefault();
+                    result = context.Students.Where(s => s.UserId == user.Id).SingleOrDefault();
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -135,7 +136,7 @@ namespace ServerApp.IO
             {
                 try
                 {
-                    result = context.Teachers.Where(t => t.User.Id == user.Id).SingleOrDefault();
+                    result = context.Teachers.Include(t => t.SubjectsTeachers).Where(t => t.UserId == user.Id).SingleOrDefault();
                 }
                 catch (InvalidOperationException ex)
                 {

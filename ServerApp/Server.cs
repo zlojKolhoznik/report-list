@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using Networking;
 using Networking.DataViews;
+using Networking.Requests;
 using Newtonsoft.Json;
 using ServerApp.IO;
 using ServerApp.Model;
@@ -49,12 +50,7 @@ namespace ServerApp
             } while (nonStop);
         }
 
-        public ResponseOptions Test(RequestOptions options)
-        {
-            return ProcessRequest(options);
-        }
-
-        private byte[] ReadTcpData(TcpClient receiver)
+        private byte[] ReadTcpBytes(TcpClient receiver)
         {
             if (receiver.Available <= 0)
             {
@@ -68,7 +64,7 @@ namespace ServerApp
             return bytes;
         }
 
-        private void SendTcpData(byte[] bytes, TcpClient sender)
+        private void SendTcpBytes(byte[] bytes, TcpClient sender)
         {
             using (var ns = sender.GetStream())
             {
@@ -78,12 +74,12 @@ namespace ServerApp
 
         private void SendTcpString(string str, TcpClient sender)
         {
-            SendTcpData(Encoding.UTF8.GetBytes(str), sender);
+            SendTcpBytes(Encoding.UTF8.GetBytes(str), sender);
         }
 
         private string ReadTcpString(TcpClient receiver)
         {
-            return Encoding.UTF8.GetString(ReadTcpData(receiver));
+            return Encoding.UTF8.GetString(ReadTcpBytes(receiver));
         }
 
         private ResponseOptions ProcessRequest(RequestOptions options)
@@ -171,15 +167,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "Group id is not provided. Cannon identify the group" };
             }
-            Group? group;
-            using (var context = new ReportlistContext())
-            {
-                group = context.Groups.FirstOrDefault(g => g.Id == options.GroupId);
-            }
-            if (group == null)
-            {
-                return new ResponseOptions() { Success = false, ErrorMessage = "No group with such id found" };
-            }
+            Group group = new Group() { Id = (int)options.GroupId };
             StudentsManager sm = new StudentsManager();
             List<Student> students = sm.GetStudents(group);
             List<StudentDataView> views = students.Select(s => new StudentDataView() { Id = s.Id, DateOfBirth = s.DateOfBirth.Ticks, GroupId = s.GroupId, Name = s.Name, Surname = s.Surname, UserId = s.UserId}).ToList();
@@ -325,7 +313,9 @@ namespace ServerApp
 
         private ResponseOptions GetGroups(RequestOptions options)
         {
-            ResponseOptions result;
+            GroupsManager gm = new GroupsManager();
+            List<Group> groups;
+            List<GroupDataView> views;
             if (options.TeacherId == null && options.SubjectId == null)
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "No teacher or subject id provided" };
@@ -334,20 +324,16 @@ namespace ServerApp
             {
                 Teacher teacher = new Teacher() { Id = (int)options.TeacherId };
                 Subject? subject = options.SubjectId == null ? null : new Subject() { Id = (int)options.SubjectId };
-                GroupsManager gm = new GroupsManager();
-                List<Group> groups = gm.GetGroups(teacher, subject);
-                List<GroupDataView> views = groups.Select(g => new GroupDataView() { Id = g.Id, Name = g.Name }).ToList();
-                result =  new ResponseOptions() { Success = true, Groups = views };
+                groups = gm.GetGroups(teacher, subject);
             }
             else
             {
                 Subject subject = new Subject() { Id = (int)options.SubjectId! };
-                GroupsManager gm = new GroupsManager();
-                List<Group> groups = gm.GetGroups(subject);
-                List<GroupDataView> views = groups.Select(g => new GroupDataView() { Id = g.Id, Name = g.Name }).ToList();
-                result = new ResponseOptions() { Success = true, Groups = views };
+                groups = gm.GetGroups(subject);
             }
-            return result;
+            views = groups.Select(g => new GroupDataView() { Id = g.Id, Name = g.Name }).ToList();
+            return new ResponseOptions() { Success = true, Groups = views };
+            ;
 
         }
 
@@ -391,9 +377,9 @@ namespace ServerApp
 
         private ResponseOptions RemoveGroup(RequestOptions options)
         {
-            if (options.GroupId == null || options.GroupName == null)
+            if (options.GroupId == null)
             {
-                return new ResponseOptions() { Success = false, ErrorMessage = "Either group id or name is not provided. Cannot rename the group" };
+                return new ResponseOptions() { Success = false, ErrorMessage = "Group id is not provided. Cannot remove the group" };
             }
             Group? group = new Group() { Id = (int)options.GroupId };
             GroupsManager gm = new GroupsManager();
@@ -441,7 +427,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "Required information is not provided" };
             }
-            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, FileData = Encoding.UTF8.GetString(hw.FileBytes), FileExtension = hw.FileExtension, GroupId = hw.GroupId, TeacherId = hw.TeacherId }).ToList();
+            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, FileData = hw.FileBytes, FileExtension = hw.FileExtension, GroupId = hw.GroupId, TeacherId = hw.TeacherId }).ToList();
             return new ResponseOptions() { Success = true, Homeworks = views };
         }
 
@@ -455,7 +441,7 @@ namespace ServerApp
             Homework homework = new Homework()
             {
                 DueDate = new DateTime((long)options.HomeworkDueDate),
-                FileBytes = Encoding.UTF8.GetBytes(options.HomeworkFileData),
+                FileBytes = options.HomeworkFileData,
                 FileExtension = options.HomeworkFileExtension,
                 GroupId = (int)options.GroupId,
                 SubjectId = (int)options.SubjectId,
@@ -476,7 +462,7 @@ namespace ServerApp
             HomeworksManager hwm = new HomeworksManager();
             try
             {
-                byte[]? bytes = options.HomeworkFileData == null ? null : Encoding.UTF8.GetBytes(options.HomeworkFileData);
+                byte[]? bytes = options.HomeworkFileData == null ? null : options.HomeworkFileData;
                 DateTime? dueDate = options.HomeworkDueDate == null ? null : new DateTime((long)options.HomeworkDueDate);
                 hwm.ChangeHomeworkInfo(homework, bytes, options.HomeworkFileExtension, dueDate);
             }
@@ -849,7 +835,7 @@ namespace ServerApp
             TeachersManager tm = new TeachersManager();
             try
             {
-                tm.AddTeacher(teacher);
+                tm.AddTeacher(teacher, subjects);
             }
             catch (Exception ex)
             {
