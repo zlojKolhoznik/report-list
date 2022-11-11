@@ -40,6 +40,7 @@ namespace ServerApp
                     using (var ns = sender.GetStream())
                     {
                         Console.WriteLine("Received data");
+                        Thread.Sleep(300); // Waiting for data to be fully sent in async method of client
                         byte[] requestBytes = new byte[sender.Available];
                         byte[] responseBytes;
                         ns.Read(requestBytes);
@@ -51,6 +52,7 @@ namespace ServerApp
                             string json = JsonConvert.SerializeObject(r);
                             responseBytes = Encoding.UTF8.GetBytes(json);
                             ns.Write(responseBytes);
+                            Console.WriteLine("Invalid requests");
                             continue;
                         }
                         ResponseOptions response = ProcessRequest(options);

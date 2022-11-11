@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Networking.DataViews;
+using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClientApp
@@ -19,10 +21,6 @@ namespace ClientApp
                 {
                     tcpClient = new TcpClient(Address.ToString(), Port);
                 }
-                if (!tcpClient.Connected)
-                {
-                    tcpClient.Connect("192.168.0.102", Port);
-                }
                 return tcpClient!;
             }
             set => tcpClient = value;
@@ -30,6 +28,7 @@ namespace ClientApp
 
         public IPAddress Address { get; set; }
         public int Port { get; set; }
+        public UserDataView? User { get; set; }
 
         public byte[] SendRequestAndReceiveResponse(byte[] request)
         {
@@ -37,13 +36,30 @@ namespace ClientApp
             using (var ns = TcpClient.GetStream())
             {
                 ns.Write(request, 0, request.Length);
-                while (TcpClient.Available <= 0);
+                while (TcpClient.Available <= 0)
+                { }
                 result = new byte[TcpClient.Available];
                 ns.Read(result);
             }
             tcpClient!.Close();
             tcpClient = null;
             return result;
+        }
+
+        public async Task<bool> CanConnect()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var check = TcpClient;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+                return true;
+            });
         }
     }
 }

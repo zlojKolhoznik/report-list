@@ -4,9 +4,11 @@ using Networking;
 using Networking.NetTools;
 using Networking.Requests;
 using Newtonsoft.Json;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,6 +19,7 @@ namespace ClientApp.MVVM.ViewModel
 		private string username;
 		private string errorMessage = "";
 		private RelayCommand? logIn;
+		private RelayCommand? cancel;
 
 		public string Username
         {
@@ -44,9 +47,9 @@ namespace ClientApp.MVVM.ViewModel
 			}
 		}
 
-		public RelayCommand? LogIn
+		public RelayCommand LogIn
 		{
-			get => logIn ??= new RelayCommand((param) =>
+			get => logIn ??= new RelayCommand(async (param) =>
 			{
 				string password = (param as PasswordBox)!.Password;
 				RequestOptions options = new RequestOptions() { RequestType = RequestType.LogIn, Login = Username, Password = password };
@@ -55,15 +58,24 @@ namespace ClientApp.MVVM.ViewModel
 				App app = (App)Application.Current;
 				app.Address = IPAddressTools.GetLocalIP();
 				app.Port = 20;
-				byte[] responseBytes = app.SendRequestAndReceiveResponse(request);
+				if (!(await app.CanConnect()))
+				{
+					ErrorMessage = "Cannot connect to the server. Try again";
+					return;
+				}
+				byte[] responseBytes = await Task.Run(() =>
+				{
+					return app.SendRequestAndReceiveResponse(request);
+				});
 				json = Encoding.UTF8.GetString(responseBytes);
 				ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
 				if (response.Success)
 				{
 					Window window = new MainWindow();
-					window.Show();
 					Window toClose = app.MainWindow;
+					window.Show();
 					app.MainWindow = window;
+					app.User = response.User;
 					toClose.Close();
 				}
 				else
@@ -77,6 +89,22 @@ namespace ClientApp.MVVM.ViewModel
 				{
 					logIn = value;
 					OnPropertyChanged(nameof(LogIn));
+				}
+			}
+		}
+
+		public RelayCommand Cancel
+		{
+			get => cancel ??= new RelayCommand((obj) =>
+			{
+				Application.Current.Shutdown();
+			});
+			set
+			{
+				if (cancel != value)
+				{
+					cancel = value;
+					OnPropertyChanged(nameof(Cancel));
 				}
 			}
 		}

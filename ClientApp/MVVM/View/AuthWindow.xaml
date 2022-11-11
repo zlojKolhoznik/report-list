@@ -64,7 +64,7 @@
         </PasswordBox>
 
         <TextBlock x:Name="errorMessage" 
-                   Foreground="#FFFFFF" 
+                   Foreground="#FF4567" 
                    Grid.Row="2"
                    Grid.ColumnSpan="2"
                    VerticalAlignment="Center"
@@ -93,7 +93,8 @@
 
             <Button Style="{StaticResource buttonsStyle}" 
                     Content="Cancel" 
-                    Background="#FF4545">
+                    Background="#FF4545"
+                    Command="{Binding Cancel}">
                 
                 <Button.Resources>
                     <Style TargetType="Border">
