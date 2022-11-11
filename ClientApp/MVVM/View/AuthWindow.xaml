@@ -16,12 +16,14 @@
     </Window.DataContext>
     
     <Grid>
+        
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.25*"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
@@ -34,11 +36,13 @@
                  Style="{StaticResource textBoxesStyle}"
                  x:Name="usernameInput"
                  Text="{Binding Login}">
+            
             <TextBox.Resources>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius" Value="10"/>
                 </Style>
             </TextBox.Resources>
+        
         </TextBox>
 
         <TextBlock Grid.Row="1" 
@@ -50,11 +54,13 @@
                      Template="{StaticResource passwordbox}" 
                      Style="{StaticResource passwordBoxStyle}"
                      x:Name="passwordInput">
+            
             <PasswordBox.Resources>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius" Value="10"/>
                 </Style>
             </PasswordBox.Resources>
+            
         </PasswordBox>
 
         <TextBlock x:Name="errorMessage" 
@@ -76,21 +82,25 @@
                     Background="#90BD18"
                     Command="{Binding LogIn}"
                     CommandParameter="{Binding ElementName=passwordInput}">
+                
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="4"/>
                     </Style>
                 </Button.Resources>
+                
             </Button>
 
             <Button Style="{StaticResource buttonsStyle}" 
                     Content="Cancel" 
                     Background="#FF4545">
+                
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="4"></Setter>
                     </Style>
                 </Button.Resources>
+                
             </Button>
 
         </StackPanel>

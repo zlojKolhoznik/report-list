@@ -3,6 +3,7 @@ using Networking;
 using Networking.Requests;
 using Newtonsoft.Json;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ClientApp.MVVM.ViewModel
@@ -47,7 +48,7 @@ namespace ClientApp.MVVM.ViewModel
 				RequestOptions options = new RequestOptions() { RequestType = RequestType.LogIn, Login = Login, Password = password };
 				string json = JsonConvert.SerializeObject(options);
 				byte[] request = Encoding.UTF8.GetBytes(json);
-				
+				ErrorMessage = Application.Current.GetType().IsAssignableTo(typeof(App)).ToString();
 			});
 			set
 			{
