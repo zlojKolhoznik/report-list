@@ -14,7 +14,7 @@ namespace Networking.DataViews
         public string FileExtension { get; set; }
 
         [JsonProperty("fileData")]
-        public string FileData { get; set; }
+        public byte[] FileData { get; set; }
 
         [JsonProperty("groupId")]
         public int GroupId { get; set; }

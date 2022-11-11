@@ -46,7 +46,7 @@ namespace Networking.Requests
         public string? HomeworkFileExtension { get; set; }
 
         [JsonProperty("hwFileData")]
-        public string? HomeworkFileData { get; set; }
+        public byte[]? HomeworkFileData { get; set; }
 
         [JsonProperty("login")]
         public string? Login { get; set; }
