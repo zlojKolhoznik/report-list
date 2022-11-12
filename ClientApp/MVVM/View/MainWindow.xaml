@@ -4,8 +4,60 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientApp.MVVM.View"
+        xmlns:vm="clr-namespace:ClientApp.MVVM.ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Щоденник" Height="600" Width="1000"
+        ResizeMode="CanMinimize"
+        Background="#888888">
+
+    <Window.DataContext>
+        <vm:MainViewModel></vm:MainViewModel>
+    </Window.DataContext>
+
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+
+        <Image Source="../../Images/logo.png"
+               HorizontalAlignment="Left"
+               Margin="15, 0, 0, 0"/>
+
+        <StackPanel Orientation="Horizontal"
+                    Grid.Column="1"
+                    VerticalAlignment="Center">
+            
+            <TextBlock Text="{Binding Username}"
+                       Style="{StaticResource mainTextBlocksStyle}"/>
+
+            <TextBlock Text="{Binding FullName}"
+                       Style="{StaticResource mainTextBlocksStyle}"/>
+
+            <TextBlock Text="{Binding Role}"
+                       Style="{StaticResource mainTextBlocksStyle}"/>
+            
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <RadioButton Content="Головна сторінка"
+                         Style="{StaticResource radioButtonStyle}"
+                         IsChecked="True"/>
+
+            <RadioButton Content="Оцінки"
+                         Style="{StaticResource radioButtonStyle}"/>
+
+            <RadioButton Content="Домашні завдання"
+                         Style="{StaticResource radioButtonStyle}"/>
+
+            <RadioButton Content="Особистий кабінет"
+                         Style="{StaticResource radioButtonStyle}"/>
+            
+        </StackPanel>
     </Grid>
 </Window>

@@ -6,7 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="AuthWindowStyles.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Styles/AuthWindowStyles.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Styles/MainWindowStyles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -29,7 +29,7 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Style="{StaticResource textBlocksStyle}"
+        <TextBlock Style="{StaticResource authTextBlocksStyle}"
                    Text="Username"/>
 
         <TextBox Grid.Column="1"
@@ -46,7 +46,7 @@
         </TextBox>
 
         <TextBlock Grid.Row="1" 
-                   Style="{StaticResource textBlocksStyle}"
+                   Style="{StaticResource authTextBlocksStyle}"
                    Text="Password"/>
 
         <PasswordBox Grid.Column="2" 
@@ -93,7 +93,7 @@
 
             <Button Style="{StaticResource buttonsStyle}" 
                     Content="Cancel" 
-                    Background="#FF4545"
+                    Background="Transparent"
                     Command="{Binding Cancel}">
                 
                 <Button.Resources>
