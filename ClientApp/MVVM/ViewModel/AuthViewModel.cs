@@ -4,9 +4,6 @@ using Networking;
 using Networking.NetTools;
 using Networking.Requests;
 using Newtonsoft.Json;
-using System;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -71,11 +68,11 @@ namespace ClientApp.MVVM.ViewModel
 				ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
 				if (response.Success)
 				{
+					app.User = response.User;
 					Window window = new MainWindow();
 					Window toClose = app.MainWindow;
 					window.Show();
 					app.MainWindow = window;
-					app.User = response.User;
 					toClose.Close();
 				}
 				else
