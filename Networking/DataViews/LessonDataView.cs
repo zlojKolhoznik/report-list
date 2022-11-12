@@ -21,5 +21,8 @@ namespace Networking.DataViews
 
         [JsonProperty("groupsIds")]
         public List<int> GroupsIds { get; set; }
+
+        [JsonProperty("subject")]
+        public string Subject { get; set; }
     }
 }

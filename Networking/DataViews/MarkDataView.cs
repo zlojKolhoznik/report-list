@@ -13,10 +13,10 @@ namespace Networking.DataViews
         [JsonProperty("studId")]
         public int StudentId { get; set; }
 
-        [JsonProperty("hwId")]
-        public int? HomeworkId { get; set; }
+        [JsonProperty("lesson")]
+        public LessonDataView? Lesson { get; set; }
 
-        [JsonProperty("lessonId")]
-        public int? LessonId { get; set; }
+        [JsonProperty("homework")]
+        public HomeworkDataView? Homework { get; set; }
     }
 }

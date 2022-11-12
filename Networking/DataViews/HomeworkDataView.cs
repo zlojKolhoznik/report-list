@@ -21,5 +21,8 @@ namespace Networking.DataViews
 
         [JsonProperty("teacherId")]
         public int TeacherId { get; set; }
+
+        [JsonProperty("subject")]
+        public string Subject { get; set; }
     }
 }

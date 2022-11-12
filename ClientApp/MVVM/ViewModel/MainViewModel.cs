@@ -1,5 +1,7 @@
 ﻿using ClientApp.Core;
 using ClientApp.MVVM.Model;
+using ClientApp.MVVM.View;
+using ClientApp.MVVM.ViewModel.Fabric;
 using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
@@ -8,10 +10,23 @@ namespace ClientApp.MVVM.ViewModel
     {
         private object currentViewModel;
         private MainModel model;
+        private RelayCommand? showPersonalInfo;
+        private RelayCommand? logOut;
+        private RelayCommand? showMarks;
+        private ViewModelFabric ViewModelFabric;
 
         public MainViewModel()
         {
             model = new MainModel();
+            currentViewModel = new PersonalInfoViewModel();
+            if (model.Student != null)
+            {
+                ViewModelFabric = new StudentsViewModelFabric();
+            }
+            else
+            {
+                ViewModelFabric = new TeachersViewModelFabric();
+            }
         }
 
         public object CurrentViewModel 
@@ -39,6 +54,7 @@ namespace ClientApp.MVVM.ViewModel
                 }
             }
         }
+
         public string FullName
         {
             get => model.FullName;
@@ -48,6 +64,63 @@ namespace ClientApp.MVVM.ViewModel
                 {
                     model.FullName = value;
                     OnPropertyChanged(nameof(FullName));
+                }
+            }
+        }
+
+        public RelayCommand? ShowPersonalInfo
+        {
+            get => showPersonalInfo ??= new RelayCommand((obj) =>
+            {
+                CurrentViewModel = new PersonalInfoViewModel();
+            });
+            set
+            {
+                if (showPersonalInfo != value)
+                {
+                    showPersonalInfo = value;
+                    OnPropertyChanged(nameof(ShowPersonalInfo));
+                }
+            }
+        }
+
+        public RelayCommand? LogOut
+        {
+            get => logOut ??= new RelayCommand((obj) =>
+            {
+                if (MessageBox.Show("Ви впевнені що хочете вийти?", "Вихід", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+                ((App)Application.Current).User = null;
+                Window authWindow = new AuthWindow();
+                Window toClose = Application.Current.MainWindow;
+                authWindow.Show();
+                App.Current.MainWindow = authWindow;
+                toClose.Close();
+            });
+            set
+            {
+                if (logOut!= value)
+                {
+                    logOut = value;
+                    OnPropertyChanged(nameof(LogOut));
+                }
+            }
+        }
+
+        public RelayCommand ShowMarks
+        {
+            get => showMarks ??= new RelayCommand((obj) =>
+            {
+                CurrentViewModel = ViewModelFabric.CreateMarksViewModel();
+            });
+            set
+            {
+                if (showMarks!= value)
+                {
+                    showMarks = value;
+                    OnPropertyChanged(nameof(ShowMarks));
                 }
             }
         }

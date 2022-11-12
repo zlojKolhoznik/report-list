@@ -609,7 +609,14 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "Not all required data is provided" };
             }
-            views = marks.Select(m => new MarkDataView() { HomeworkId = m.HomeworkId, Id = m.Id, LessonId = m.LessonId, StudentId = m.StudentId, Value = m.Value }).ToList();
+            views = marks.Select(m => new MarkDataView()
+            {
+                Homework = m.Homework == null ? null : new HomeworkDataView() { DueDate = m.Homework.DueDate.Ticks, Subject = m.Homework.Subject.Name },
+                Id = m.Id,
+                Lesson = m.Lesson == null ? null : new LessonDataView() { Date = m.Lesson.Date.Ticks, Subject = m.Lesson.Subject.Name },
+                StudentId = m.StudentId,
+                Value = m.Value
+            }).ToList();
             return new ResponseOptions() { Success = true, Marks = views };
         }
 

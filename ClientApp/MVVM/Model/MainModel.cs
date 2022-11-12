@@ -1,5 +1,4 @@
-﻿using ClientApp.Core;
-using Networking.DataViews;
+﻿using Networking.DataViews;
 using Networking.Requests;
 using Newtonsoft.Json;
 using System.Text;
@@ -17,12 +16,6 @@ namespace ClientApp.MVVM.Model
         {
             App app = (App)Application.Current;
             User = app.User!;
-            if (User.IsAdmin)
-            {
-                Role = "Admin";
-                FullName = User.Login;
-                return;
-            }
             RequestOptions request = new RequestOptions() { RequestType = RequestType.GetStudent, UserId = User.Id };
             string json = JsonConvert.SerializeObject(request);
             byte[] requestBytes = Encoding.UTF8.GetBytes(json);
@@ -49,13 +42,14 @@ namespace ClientApp.MVVM.Model
                 teacher = response.Teacher;
                 return;
             }
-            MessageBox.Show("The current user is not registered! The application will shutdown immediately", "Unauthorised access", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("The current user is not registered! The application will close after you close the window.", "Unauthorised access", MessageBoxButton.OK, MessageBoxImage.Error);
+            app.Shutdown();
         }
 
         public UserDataView User { get; set; }
-
+        public TeacherDataView? Teacher => teacher;
+        public StudentDataView? Student => student;
         public string Role { get; set; }
-
         public string FullName { get; set; }
     }
 }

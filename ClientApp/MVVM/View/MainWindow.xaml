@@ -42,19 +42,31 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1">
-            <RadioButton Content="Головна сторінка"
+            
+            <RadioButton Content="Особистий кабінет"
                          Style="{StaticResource radioButtonStyle}"
-                         IsChecked="True"/>
-
+                         IsChecked="True"
+                         Command="{Binding ShowPersonalInfo}"/>
+            
             <RadioButton Content="Оцінки"
-                         Style="{StaticResource radioButtonStyle}"/>
+                         Style="{StaticResource radioButtonStyle}"
+                         Command="{Binding ShowMarks}"/>
 
             <RadioButton Content="Домашні завдання"
                          Style="{StaticResource radioButtonStyle}"/>
 
-            <RadioButton Content="Особистий кабінет"
+            <RadioButton Content="Заняття"
                          Style="{StaticResource radioButtonStyle}"/>
-            
+
+            <RadioButton Content="Вихід"
+                         Style="{StaticResource radioButtonStyle}"
+                         Command="{Binding LogOut}"/>
+
         </StackPanel>
+
+        <ContentControl Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="10"
+                        Content="{Binding CurrentViewModel}"/>
     </Grid>
 </Window>

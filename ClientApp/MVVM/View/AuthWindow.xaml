@@ -79,7 +79,7 @@
 
             <Button Style="{StaticResource buttonsStyle}"
                     Content="Login"
-                    Background="#90BD18"
+                    Background="#FEFE85"
                     Command="{Binding LogIn}"
                     CommandParameter="{Binding ElementName=passwordInput}">
                 

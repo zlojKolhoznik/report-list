@@ -22,7 +22,9 @@ namespace ServerApp.IO
             {
                 result = context.Marks.Include(m => m.Student)
                                       .Include(m => m.Homework)
+                                      .ThenInclude(hw => hw.Subject)
                                       .Include(m => m.Lesson)
+                                      .ThenInclude(l => l.Subject)
                                       .Where(m => m.Student.GroupId == group.Id)
                                       .ToList();
             }
@@ -35,7 +37,12 @@ namespace ServerApp.IO
             List<Mark> result = new List<Mark>();
             using (var context = new ReportlistContext())
             {
-                result = context.Marks.Where(m => m.StudentId == student.Id).ToList();
+                result = context.Marks.Include(m => m.Lesson)
+                                      .ThenInclude(l => l.Subject)
+                                      .Include(m => m.Homework)
+                                      .ThenInclude(hw => hw.Subject)
+                                      .Where(m => m.StudentId == student.Id)
+                                      .ToList();
             }
             return result;
         }
