@@ -12,5 +12,8 @@ namespace Networking.DataViews
 
         [JsonProperty("pword")]
         public string Password { get; set; }
+
+        [JsonProperty("isAdmin")]
+        public bool IsAdmin { get; set; }
     }
 }

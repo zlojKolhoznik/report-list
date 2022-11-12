@@ -182,7 +182,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "Incorrect password. Check your login information" };
             }
-            UserDataView udw = new UserDataView() { Id = user.Id, Login = user.Login, Password = user.Password };
+            UserDataView udw = new UserDataView() { Id = user.Id, Login = user.Login, Password = user.Password, IsAdmin = user.IsAdmin };
             return new ResponseOptions() { Success = true, User = udw };
         }
 
