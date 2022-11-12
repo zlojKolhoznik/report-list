@@ -1,21 +1,55 @@
-﻿using System.Windows;
+﻿using ClientApp.Core;
+using ClientApp.MVVM.Model;
+using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
 {
-    internal class MainViewModel
+    internal class MainViewModel : ObservableObject
     {
+        private object currentViewModel;
+        private MainModel model;
+
         public MainViewModel()
         {
-            //App app = (App)Application.Current;
-            //if (app.User!.IsAdmin)
-            //{
-            //    CurrentViewModel = new AdminViewModel();
-            //}
+            model = new MainModel();
         }
-        public object CurrentViewModel { get; set; }
 
-        public string Role { get; set; } = "Student";
-        public string Username { get; set; } = "stud3203";
-        public string FullName { get; set; } = "Olexander Avramenko";
+        public object CurrentViewModel 
+        {
+            get => currentViewModel;
+            set
+            {
+                if (currentViewModel != value)
+                {
+                    currentViewModel = value;
+                    OnPropertyChanged(nameof(CurrentViewModel));
+                }
+            } 
+        }
+
+        public string Role 
+        {
+            get => model.Role;
+            set
+            {
+                if (model.Role != value)
+                {
+                    model.Role = value;
+                    OnPropertyChanged(nameof(Role));
+                }
+            }
+        }
+        public string FullName
+        {
+            get => model.FullName;
+            set
+            {
+                if (model.FullName != value)
+                {
+                    model.FullName = value;
+                    OnPropertyChanged(nameof(FullName));
+                }
+            }
+        }
     }
 }

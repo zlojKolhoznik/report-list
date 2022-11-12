@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MVVM\Model\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Networking\Networking.csproj" />
   </ItemGroup>
 
