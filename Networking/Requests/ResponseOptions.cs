@@ -1,7 +1,7 @@
 ﻿using Networking.DataViews;
 using Newtonsoft.Json;
 
-namespace Networking
+namespace Networking.Requests
 {
     public class ResponseOptions
     {

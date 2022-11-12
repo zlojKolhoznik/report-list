@@ -1,4 +1,4 @@
-﻿namespace Networking
+﻿namespace Networking.Requests
 {
     public enum RequestType
     {
