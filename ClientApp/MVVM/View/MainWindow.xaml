@@ -32,9 +32,6 @@
         <StackPanel Orientation="Horizontal"
                     Grid.Column="1"
                     VerticalAlignment="Center">
-            
-            <TextBlock Text="{Binding Username}"
-                       Style="{StaticResource mainTextBlocksStyle}"/>
 
             <TextBlock Text="{Binding FullName}"
                        Style="{StaticResource mainTextBlocksStyle}"/>
