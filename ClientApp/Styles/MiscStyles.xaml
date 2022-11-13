@@ -11,5 +11,15 @@
         </Style.Setters>
 
     </Style>
+
+    <Style x:Key="comboBoxStyle" TargetType="ComboBox">
+
+        <Style.Setters>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style.Setters>
+        
+    </Style>
     
 </ResourceDictionary>
