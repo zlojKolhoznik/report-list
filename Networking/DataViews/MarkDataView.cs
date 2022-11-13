@@ -18,5 +18,8 @@ namespace Networking.DataViews
 
         [JsonProperty("homework")]
         public HomeworkDataView? Homework { get; set; }
+
+        [JsonProperty("student")]
+        public StudentDataView? Student { get; set; }
     }
 }

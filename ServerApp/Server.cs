@@ -615,7 +615,8 @@ namespace ServerApp
                 Id = m.Id,
                 Lesson = m.Lesson == null ? null : new LessonDataView() { Date = m.Lesson.Date.Ticks, Subject = m.Lesson.Subject.Name },
                 StudentId = m.StudentId,
-                Value = m.Value
+                Value = m.Value,
+                Student = m.Student == null ? null : new StudentDataView() { Id = m.StudentId, Name = m.Student.Name, Surname = m.Student.Surname }
             }).ToList();
             return new ResponseOptions() { Success = true, Marks = views };
         }

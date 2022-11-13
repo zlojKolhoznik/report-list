@@ -21,6 +21,10 @@
                 <view:StudentsMarks/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:TeachersMarksViewModel}">
+                <view:TeachersMarks/>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

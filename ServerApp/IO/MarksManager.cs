@@ -108,11 +108,11 @@ namespace ServerApp.IO
         {
             if (subject != null)
             {
-                source = source.Where(m => m.Lesson?.Subject.Id == subject.Id || m.Homework?.Subject.Id == subject.Id).ToList();
+                source = source.Where(m => m.Lesson?.SubjectId == subject.Id || m.Homework?.SubjectId == subject.Id).ToList();
             }
             if (teacher != null)
             {
-                source = source.Where(m => m.Lesson?.Teacher.Id == teacher.Id || m.Homework?.Teacher.Id == teacher.Id).ToList();
+                source = source.Where(m => m.Lesson?.TeacherId == teacher.Id || m.Homework?.TeacherId == teacher.Id).ToList();
             }
             return source;
         }
