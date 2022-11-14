@@ -144,5 +144,19 @@ namespace ServerApp.IO
             }
 
         }
+
+        public byte[] GetHomeworkFile(Homework homework)
+        {
+            byte[]? result;
+            using (var context = new ReportlistContext())
+            {
+                result = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id)?.FileBytes;
+            }
+            if (result == null)
+            {
+                throw new ArgumentException("Homework ID was not found in the database", nameof(homework));
+            }
+            return result;
+        }
     }
 }

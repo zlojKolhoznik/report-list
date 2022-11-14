@@ -37,5 +37,8 @@ namespace Networking.Requests
 
         [JsonProperty("subjects")]
         public List<SubjectDataView>? Subjects { get; set; }
+
+        [JsonProperty("hwFile")]
+        public byte[]? HomeworkFile { get; set; }
     }
 }

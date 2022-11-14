@@ -36,6 +36,7 @@
         ChangeTeacher,
         RemoveTeacher,
         AddSubjectTeacher,
-        RemoveSubjectTeacher
+        RemoveSubjectTeacher,
+        GetHomeworkFile
     }
 }

@@ -140,8 +140,28 @@ namespace ServerApp
                     return RemoveSubjectTeacher(options);
                 case RequestType.GetStudents:
                     return GetStudents(options);
+                case RequestType.GetHomeworkFile:
+                    return GetGomeworkFile(options);
                 default:
                     return new ResponseOptions() { Success = false, ErrorMessage = "Invalid request type. Try again" };
+            }
+        }
+
+        private ResponseOptions GetGomeworkFile(RequestOptions options)
+        {
+            if (options.HomeworkId == null)
+            {
+                throw new ArgumentNullException(nameof(options.HomeworkId), "The homework ID is not provided. Can not get the file");
+            }
+            Homework homework = new Homework() { Id = (int)options.HomeworkId };
+            HomeworksManager hwm = new HomeworksManager();
+            try
+            {
+                return new ResponseOptions() { Success = true, HomeworkFile = hwm.GetHomeworkFile(homework) };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
             }
         }
 
