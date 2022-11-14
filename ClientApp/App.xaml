@@ -29,6 +29,10 @@
                 <view:StudentLessons/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:TeachersLessonsViewModel}">
+                <view:TeachersLessons/>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
