@@ -21,5 +21,10 @@ namespace Networking.DataViews
 
         [JsonProperty("userId")]
         public int UserId { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Name} {Surname}";
+        }
     }
 }

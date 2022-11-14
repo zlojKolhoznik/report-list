@@ -157,7 +157,7 @@ namespace ServerApp
             HomeworksManager hwm = new HomeworksManager();
             try
             {
-                return new ResponseOptions() { Success = true, HomeworkFile = hwm.GetHomeworkFile(homework) };
+                return new ResponseOptions() { Success = true, HomeworkFile = hwm.GetHomeworkFile(homework), HomeworkFileExtension = hwm.GetHomeworkFileExtension(homework) };
             }
             catch (Exception ex)
             {
@@ -431,7 +431,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "Required information is not provided" };
             }
-            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, FileData = hw.FileBytes, FileExtension = hw.FileExtension, GroupId = hw.GroupId, TeacherId = hw.TeacherId }).ToList();
+            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, GroupId = hw.GroupId, TeacherId = hw.TeacherId, Subject = hw.Subject.Name }).ToList();
             return new ResponseOptions() { Success = true, Homeworks = views };
         }
 

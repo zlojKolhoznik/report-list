@@ -1,4 +1,5 @@
-﻿using ServerApp.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerApp.Model;
 
 namespace ServerApp.IO
 {
@@ -18,7 +19,7 @@ namespace ServerApp.IO
             var result = new List<Homework>();
             using (var context = new ReportlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.SubjectId == subject.Id).ToList();
+                result = context.Homeworks.Include(hw => hw.Subject).Where(hw => hw.GroupId == group.Id && hw.SubjectId == subject.Id).ToList();
             }
             return result;
         }
@@ -34,7 +35,7 @@ namespace ServerApp.IO
             var result = new List<Homework>();
             using (var context = new ReportlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.DueDate.Date == dueDate.Date).ToList();
+                result = context.Homeworks.Include(hw => hw.Subject).Where(hw => hw.GroupId == group.Id && hw.DueDate.Date == dueDate.Date).ToList();
             }
             return result;
         }
@@ -50,7 +51,7 @@ namespace ServerApp.IO
             var result = new List<Homework>();
             using (var context = new ReportlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.GroupId == group.Id && hw.TeacherId == teacher.Id).ToList();
+                result = context.Homeworks.Include(hw => hw.Subject).Where(hw => hw.GroupId == group.Id && hw.TeacherId == teacher.Id).ToList();
             }
             return result;
         }
@@ -66,7 +67,7 @@ namespace ServerApp.IO
             var result = new List<Homework>();
             using (var context = new ReportlistContext())
             {
-                result = context.Homeworks.Where(hw => hw.TeacherId == teacher.Id && hw.SubjectId == subject.Id).ToList();
+                result = context.Homeworks.Include(hw => hw.Subject).Where(hw => hw.TeacherId == teacher.Id && hw.SubjectId == subject.Id).ToList();
             }
             return result;
         }
@@ -151,6 +152,20 @@ namespace ServerApp.IO
             using (var context = new ReportlistContext())
             {
                 result = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id)?.FileBytes;
+            }
+            if (result == null)
+            {
+                throw new ArgumentException("Homework ID was not found in the database", nameof(homework));
+            }
+            return result;
+        }
+
+        public string GetHomeworkFileExtension(Homework homework)
+        {
+            string result;
+            using (var context = new ReportlistContext())
+            {
+                result = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id)?.FileExtension;
             }
             if (result == null)
             {

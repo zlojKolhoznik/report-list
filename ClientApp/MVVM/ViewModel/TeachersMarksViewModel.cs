@@ -1,8 +1,11 @@
 ﻿using ClientApp.Core;
 using ClientApp.MVVM.Model;
+using ClientApp.MVVM.View;
 using Networking.DataViews;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
 {
@@ -12,6 +15,7 @@ namespace ClientApp.MVVM.ViewModel
 		private List<SubjectDataView> subjects;
 		private List<string> marksViews;
 		private RelayCommand? getMarks;
+		private RelayCommand? addMark;
 		private TeachersMarksModel model;
 		private int? selectedSubjectId;
 		private int selectedGroupId;
@@ -30,7 +34,8 @@ namespace ClientApp.MVVM.ViewModel
             subjects.Insert(0, new SubjectDataView { Name = "Будь-який", Id = null });
             SelectedSubjectId = null;
             SelectedGroupId = (int)groups!.First().Id!;
-        }
+		}
+
 
 		public List<string> MarksViews
 		{
@@ -109,6 +114,42 @@ namespace ClientApp.MVVM.ViewModel
 				{
 					getMarks = value;
 					OnPropertyChanged(nameof(GetMarks));
+				}
+			}
+		}
+
+		public RelayCommand AddMark
+		{
+			get => addMark ??= new RelayCommand((obj) =>
+			{
+				List<HomeworkDataView> homeworks = model.GetHomeworks();
+				List<GroupDataView> groups = model.GetGroups();
+				Dictionary<int, string> pairs = new Dictionary<int, string>();
+				foreach (var homework in homeworks)
+				{
+					pairs.Add(homework.Id, $"{groups.Single(g=>g.Id == homework.GroupId).Name} з {homework.Subject} до {new DateTime(homework.DueDate).ToShortDateString()}");
+				}
+
+                AddMarkDialog amd = new AddMarkDialog(model.GetLessons(), pairs, model.GetStudents());
+				if (amd.ShowDialog() == true)
+				{
+					try
+					{
+						AddMarkViewModel amvm = (AddMarkViewModel)amd.DataContext;
+						model.AddMark(int.Parse(amvm.MarkString), amvm.SelectedStudentId, amvm.SelectedHomeworkId, amvm.SelectedLessonId);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+					}
+				}
+			});
+			set
+			{
+				if (addMark != value)
+				{
+					addMark = value;
+					OnPropertyChanged(nameof(AddMark));
 				}
 			}
 		}

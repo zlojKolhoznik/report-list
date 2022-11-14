@@ -21,5 +21,9 @@
         </Style.Setters>
         
     </Style>
+
+    <Style x:Key="addMarkRadioButtonStyle">
+        
+    </Style>
     
 </ResourceDictionary>

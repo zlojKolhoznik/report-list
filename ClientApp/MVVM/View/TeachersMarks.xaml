@@ -55,7 +55,8 @@
 
         <StackPanel Grid.Row="3"
                     Grid.ColumnSpan="2"
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
 
             <Button Content="Отримати оцінки"
                         Command="{Binding GetMarks}"
@@ -69,7 +70,20 @@
                 </Button.Resources>
 
             </Button>
-            
+
+            <Button Content="Додати оцінку"
+                        Command="{Binding AddMark}"
+                        Style="{StaticResource buttonsStyle}"
+                        Background="#FEFE85">
+
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+
+            </Button>
+
         </StackPanel>
 
     </Grid>
