@@ -1,13 +1,8 @@
 ﻿using ClientApp.Core;
 using ClientApp.MVVM.Model;
 using Networking.DataViews;
-using Networking.Requests;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
 {
@@ -32,10 +27,9 @@ namespace ClientApp.MVVM.ViewModel
                 List<SubjectDataView> temp = model.GetSubjects(group);
                 subjects.AddRange(temp.ExceptBy(subjects.Select(s => s.Id), s => s.Id));
             }
-			subjects = subjects.Where(s => model.Teacher.SubjectsIds.Contains( (int)s.Id!)).ToList();
             subjects.Insert(0, new SubjectDataView { Name = "Будь-який", Id = null });
-            selectedSubjectId = null;
-            selectedGroupId = (int)groups!.First().Id!;
+            SelectedSubjectId = null;
+            SelectedGroupId = (int)groups!.First().Id!;
         }
 
 		public List<string> MarksViews

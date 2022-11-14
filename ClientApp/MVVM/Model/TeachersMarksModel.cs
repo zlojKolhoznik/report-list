@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClientApp.MVVM.Model
@@ -53,7 +52,7 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            return response.Subjects!;
+            return response.Subjects!.Where(s=>teacher.SubjectsIds.Contains((int)s.Id!)).ToList();
         }
 
         public List<string> GetMarksViews(int groupId, int? subjectId)
