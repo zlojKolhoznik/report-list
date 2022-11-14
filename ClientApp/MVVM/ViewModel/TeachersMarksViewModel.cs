@@ -33,7 +33,7 @@ namespace ClientApp.MVVM.ViewModel
                 subjects.AddRange(temp.ExceptBy(subjects.Select(s => s.Id), s => s.Id));
             }
 			subjects = subjects.Where(s => model.Teacher.SubjectsIds.Contains( (int)s.Id!)).ToList();
-            subjects.Insert(0, new SubjectDataView { Name = "Any", Id = null });
+            subjects.Insert(0, new SubjectDataView { Name = "Будь-який", Id = null });
             selectedSubjectId = null;
             selectedGroupId = (int)groups!.First().Id!;
         }

@@ -56,7 +56,8 @@
                          Style="{StaticResource radioButtonStyle}"/>
 
             <RadioButton Content="Заняття"
-                         Style="{StaticResource radioButtonStyle}"/>
+                         Style="{StaticResource radioButtonStyle}"
+                         Command="{Binding ShowLessons}"/>
 
             <RadioButton Content="Вихід"
                          Style="{StaticResource radioButtonStyle}"

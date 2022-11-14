@@ -13,7 +13,7 @@ namespace ClientApp.MVVM.ViewModel.Fabric
             return new TeachersHomeworksViewModel();
         }
 
-        public override LessonsViewModel CreateLessonsViewMOdel()
+        public override LessonsViewModel CreateLessonsViewModel()
         {
             return new TeachersLessonsViewModel();
         }

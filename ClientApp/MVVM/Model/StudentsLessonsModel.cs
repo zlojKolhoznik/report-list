@@ -1,0 +1,111 @@
+﻿using Networking.DataViews;
+using Networking.Requests;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+
+namespace ClientApp.MVVM.Model
+{
+    internal class StudentsLessonsModel
+    {
+        private App app;
+        private StudentDataView student;
+
+        public StudentsLessonsModel()
+        {
+            app = (App)Application.Current;
+            student = GetStudent(app.User!.Id);
+        }
+
+        public StudentDataView Student => student;
+
+        public List<SubjectDataView> GetSubjects()
+        {
+            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetSubjects, GroupId = student.GroupId };
+            string json = JsonConvert.SerializeObject(request);
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            bytes = app.SendRequestAndReceiveResponse(bytes);
+            json = Encoding.UTF8.GetString(bytes);
+            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            return response.Subjects!;
+        }
+
+        public List<string> GetLessonsView(int? subjectId = null, DateTime? date = null)
+        {
+            if (subjectId == null && date == null)
+            {
+                throw new ArgumentNullException("To get lessons should be provided at least the subject or the date");
+            }
+            List<string> result = new List<string>();
+            RequestOptions request;
+            ResponseOptions response;
+            byte[] bytes;
+            string json;
+            if (date != null && subjectId != null)
+            {
+                request = new RequestOptions() { RequestType = RequestType.GetLessons, GroupId = student.GroupId, LessonDate = date.Value.Ticks };
+                json = JsonConvert.SerializeObject(request);
+                bytes = Encoding.UTF8.GetBytes(json);
+                bytes = app.SendRequestAndReceiveResponse(bytes);
+                json = Encoding.UTF8.GetString(bytes);
+                response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                List<LessonDataView> lessonsForDate = response.Lessons!.ToList();
+                request = new RequestOptions() { RequestType = RequestType.GetLessons, GroupId = student.GroupId, SubjectId = subjectId };
+                json = JsonConvert.SerializeObject(request);
+                bytes = Encoding.UTF8.GetBytes(json);
+                bytes = app.SendRequestAndReceiveResponse(bytes);
+                json = Encoding.UTF8.GetString(bytes);
+                response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                List<LessonDataView> lessonsForSubject = response.Lessons!.ToList();
+                foreach (var lesson in lessonsForDate.IntersectBy(lessonsForSubject.Select(l=>l.Id), l=>l.Id))
+                {
+                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                }
+                return result;
+            }
+            else if (subjectId != null)
+            {
+                request = new RequestOptions() { RequestType = RequestType.GetLessons, GroupId = student.GroupId, SubjectId = subjectId };
+                json = JsonConvert.SerializeObject(request);
+                bytes = Encoding.UTF8.GetBytes(json);
+                bytes = app.SendRequestAndReceiveResponse(bytes);
+                json = Encoding.UTF8.GetString(bytes);
+                response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                foreach (var lesson in response.Lessons!)
+                {
+                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                }
+                return result;
+            }
+            else
+            {
+                request = new RequestOptions() { RequestType = RequestType.GetLessons, GroupId = student.GroupId, LessonDate = date!.Value.Ticks };
+                json = JsonConvert.SerializeObject(request);
+                bytes = Encoding.UTF8.GetBytes(json);
+                bytes = app.SendRequestAndReceiveResponse(bytes);
+                json = Encoding.UTF8.GetString(bytes);
+                response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                foreach (var lesson in response.Lessons!)
+                {
+                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                }
+                return result;
+            }
+        }
+
+        private StudentDataView GetStudent(int userId)
+        {
+            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetStudent, UserId = userId };
+            string json = JsonConvert.SerializeObject(request);
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            bytes = app.SendRequestAndReceiveResponse(bytes);
+            json = Encoding.UTF8.GetString(bytes);
+            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            return response.Student!;
+        }
+    }
+}

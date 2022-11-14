@@ -13,6 +13,7 @@ namespace ClientApp.MVVM.ViewModel
         private RelayCommand? showPersonalInfo;
         private RelayCommand? logOut;
         private RelayCommand? showMarks;
+        private RelayCommand? showLessons;
         private ViewModelFabric ViewModelFabric;
 
         public MainViewModel()
@@ -121,6 +122,22 @@ namespace ClientApp.MVVM.ViewModel
                 {
                     showMarks = value;
                     OnPropertyChanged(nameof(ShowMarks));
+                }
+            }
+        }
+
+        public RelayCommand ShowLessons
+        {
+            get => showLessons ??= new RelayCommand((obj) =>
+            {
+                CurrentViewModel = ViewModelFabric.CreateLessonsViewModel();
+            });
+            set
+            {
+                if (showLessons != value)
+                {
+                    showLessons = value;
+                    OnPropertyChanged(nameof(ShowLessons));
                 }
             }
         }

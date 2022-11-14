@@ -70,7 +70,7 @@ namespace Networking.Requests
         public string? LessonTopic { get; set; }
 
         [JsonProperty("lDate")]
-        public int? LessonDate { get; set; }
+        public long? LessonDate { get; set; }
 
         [JsonProperty("lGroupsIds")]
         public List<int>? LessonGroupsIds { get; set; }
