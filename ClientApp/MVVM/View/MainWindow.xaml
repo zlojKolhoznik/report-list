@@ -53,7 +53,8 @@
                          Command="{Binding ShowMarks}"/>
 
             <RadioButton Content="Домашні завдання"
-                         Style="{StaticResource radioButtonStyle}"/>
+                         Style="{StaticResource radioButtonStyle}"
+                         Command="{Binding ShowHomeworks}"/>
 
             <RadioButton Content="Заняття"
                          Style="{StaticResource radioButtonStyle}"

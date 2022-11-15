@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="ClientApp.MVVM.View.StudentsHomeworks"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ClientApp.MVVM.View"
+             xmlns:vm="clr-namespace:ClientApp.MVVM.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <vm:StudentHomeworksViewModel/>
+    </UserControl.DataContext>
+    
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Предмет"
+                   Style="{StaticResource mainTextBlocksStyle}"/>
+        
+        <CheckBox  Content="Дата"
+                   Foreground="White"
+                   FontSize="24"
+                   IsChecked="{Binding IsDateUsed}"
+                   Grid.Column="1"/>
+
+        <ComboBox ItemsSource="{Binding Subjects}"
+                  DisplayMemberPath="Name"
+                  SelectedValuePath="Id"
+                  Grid.Row="1"
+                  SelectedValue="{Binding SelectedSubjectId}"
+                  Style="{StaticResource comboBoxStyle}"/>
+
+        <DatePicker SelectedDate="{Binding Date}"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    IsEnabled="{Binding IsDateUsed}"
+                    VerticalAlignment="Center"
+                    Margin="5"
+                    FontSize="14"/>
+
+        <ListBox ItemsSource="{Binding Homeworks}"
+                 DisplayMemberPath="Value"
+                 SelectedValuePath="Key"
+                 SelectedValue="{Binding SelectedHomeworkId}"
+                 Style="{StaticResource listBoxStyle}"
+                 Grid.Row="2"
+                 Grid.ColumnSpan="2"/>
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Grid.Row="3"
+                    Grid.ColumnSpan="2">
+
+            <Button Content="Оновити список"
+                Command="{Binding GetHomeworks}"
+                Style="{StaticResource buttonsStyle}"
+                Background="#F4F485"
+                Grid.Row="1">
+
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+
+            </Button>
+
+            <Button Content="Завантажити завдання"
+                Command="{Binding DownloadFile}"
+                Style="{StaticResource buttonsStyle}"
+                Background="#F4F485"
+                Grid.Row="1">
+
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="10"/>
+                    </Style>
+                </Button.Resources>
+                
+            </Button>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
