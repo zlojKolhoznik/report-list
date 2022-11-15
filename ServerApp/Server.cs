@@ -55,10 +55,40 @@ namespace ServerApp
                             Console.WriteLine("Invalid requests");
                             continue;
                         }
-                        ResponseOptions response = ProcessRequest(options);
-                        string responseJson = JsonConvert.SerializeObject(response);
-                        responseBytes = Encoding.UTF8.GetBytes(responseJson);
-                        ns.Write(responseBytes);
+                        if (options.RequestType != RequestType.GetHomeworkFile)
+                        {
+                            ResponseOptions response = ProcessRequest(options);
+                            string responseJson = JsonConvert.SerializeObject(response, Formatting.Indented);
+                            responseBytes = Encoding.UTF8.GetBytes(responseJson);
+                            ns.Write(responseBytes);
+                        }
+                        else
+                        {
+                            HomeworksManager hwm = new HomeworksManager();
+                            Homework hw = new Homework() { Id = (int)options.HomeworkId! };
+                            string ext = hwm.GetHomeworkFileExtension(hw);
+                            byte[] file = hwm.GetHomeworkFile(hw);
+                            string len = file.Length.ToString();
+                            int buffSize = 1024;
+                            int buffCount = (int)Math.Ceiling(Convert.ToSingle(len) / buffSize);
+                            Dictionary<string, string> headers = new Dictionary<string, string>()
+                            {
+                                { "Content-Length", len },
+                                { "File-Extension", ext}
+                            };
+                            string json = JsonConvert.SerializeObject(headers);
+                            byte[] bytes = Encoding.UTF8.GetBytes(json);
+                            ns.Write(bytes);
+                            using (MemoryStream ms = new MemoryStream(file))
+                            {
+                                for (int i = 0; i < buffCount; i++)
+                                {
+                                    byte[] buffer = new byte[buffSize];
+                                    int size = ms.Read(buffer, 0, buffSize);
+                                    ns.Write(buffer, 0, size);
+                                }
+                            }
+                        }
                         sender.Close();
                     }
                     Console.WriteLine("Sent data");
@@ -140,28 +170,8 @@ namespace ServerApp
                     return RemoveSubjectTeacher(options);
                 case RequestType.GetStudents:
                     return GetStudents(options);
-                case RequestType.GetHomeworkFile:
-                    return GetGomeworkFile(options);
                 default:
                     return new ResponseOptions() { Success = false, ErrorMessage = "Invalid request type. Try again" };
-            }
-        }
-
-        private ResponseOptions GetGomeworkFile(RequestOptions options)
-        {
-            if (options.HomeworkId == null)
-            {
-                throw new ArgumentNullException(nameof(options.HomeworkId), "The homework ID is not provided. Can not get the file");
-            }
-            Homework homework = new Homework() { Id = (int)options.HomeworkId };
-            HomeworksManager hwm = new HomeworksManager();
-            try
-            {
-                return new ResponseOptions() { Success = true, HomeworkFile = hwm.GetHomeworkFile(homework), HomeworkFileExtension = hwm.GetHomeworkFileExtension(homework) };
-            }
-            catch (Exception ex)
-            {
-                return new ResponseOptions() { Success = false, ErrorMessage = ex.Message };
             }
         }
 

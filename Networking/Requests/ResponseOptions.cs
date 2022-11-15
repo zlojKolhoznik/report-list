@@ -39,7 +39,7 @@ namespace Networking.Requests
         public List<SubjectDataView>? Subjects { get; set; }
 
         [JsonProperty("hwFile")]
-        public byte[]? HomeworkFile { get; set; }
+        public List<byte>? HomeworkFile { get; set; }
 
         [JsonProperty("hwFileExtension")]
         public string? HomeworkFileExtension { get; set; }
