@@ -42,7 +42,7 @@ namespace ClientApp.MVVM.Model
                 teacher = response.Teacher;
                 return;
             }
-            MessageBox.Show("The current user is not registered! The application will close after you close the window.", "Unauthorised access", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("The current user is not registered as a student or a teacher! The application will close after you close the window.", "Unauthorised access", MessageBoxButton.OK, MessageBoxImage.Error);
             app.Shutdown();
         }
 

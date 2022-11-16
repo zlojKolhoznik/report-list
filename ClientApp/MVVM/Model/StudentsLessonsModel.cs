@@ -31,6 +31,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Subjects!;
         }
 
@@ -53,6 +57,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 List<LessonDataView> lessonsForDate = response.Lessons!.ToList();
                 request = new RequestOptions() { RequestType = RequestType.GetLessons, GroupId = student.GroupId, SubjectId = subjectId };
                 json = JsonConvert.SerializeObject(request);
@@ -60,6 +68,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 List<LessonDataView> lessonsForSubject = response.Lessons!.ToList();
                 foreach (var lesson in lessonsForDate.IntersectBy(lessonsForSubject.Select(l=>l.Id), l=>l.Id))
                 {
@@ -75,6 +87,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 foreach (var lesson in response.Lessons!)
                 {
                     result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
@@ -89,6 +105,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 foreach (var lesson in response.Lessons!)
                 {
                     result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
@@ -105,6 +125,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Student!;
         }
     }

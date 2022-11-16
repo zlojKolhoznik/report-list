@@ -30,6 +30,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Teacher!;
         }
 
@@ -41,6 +45,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Groups!;
         }
 
@@ -52,6 +60,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Subjects!.Where(s=>teacher.SubjectsIds.Contains((int)s.Id!)).ToList();
         }
 
@@ -67,6 +79,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 students.AddRange(response.Students!);
             }
             return students;
@@ -84,6 +100,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 result.AddRange(response.Lessons!.ExceptBy(result.Select(l => l.Id), l => l.Id));
             }
             return result;
@@ -101,6 +121,10 @@ namespace ClientApp.MVVM.Model
                 bytes = app.SendRequestAndReceiveResponse(bytes);
                 json = Encoding.UTF8.GetString(bytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+                if (!response.Success)
+                {
+                    throw new Exception(response.ErrorMessage);
+                }
                 result.AddRange(response.Homeworks!.ExceptBy(result.Select(l => l.Id), l => l.Id));
             }
             return result;
@@ -128,6 +152,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             var result = new List<string>();
             foreach (var mark in response.Marks!)
             {

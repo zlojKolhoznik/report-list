@@ -24,6 +24,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             student = response.Student!;
         }
 
@@ -36,6 +40,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             foreach (var mark in response.Marks!)
             {
                 if (mark.Lesson != null)

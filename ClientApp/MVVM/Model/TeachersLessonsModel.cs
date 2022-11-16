@@ -46,6 +46,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Groups!;
         }
 
@@ -57,6 +61,10 @@ namespace ClientApp.MVVM.Model
             bytes = app.SendRequestAndReceiveResponse(bytes);
             json = Encoding.UTF8.GetString(bytes);
             ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
+            if (!response.Success)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
             return response.Subjects!.Where(s=>teacher.SubjectsIds.Contains((int)s.Id!)).ToList();
         }
 
