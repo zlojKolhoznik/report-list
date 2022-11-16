@@ -2,6 +2,7 @@
 using ClientApp.MVVM.Model;
 using ClientApp.MVVM.View;
 using ClientApp.MVVM.ViewModel.Fabric;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel

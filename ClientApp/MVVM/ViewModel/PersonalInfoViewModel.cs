@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,6 +15,7 @@ namespace ClientApp.MVVM.ViewModel
     {
         private string username;
         private string password;
+        private RelayCommand? changePassword;
 
         public PersonalInfoViewModel()
         {
@@ -50,11 +52,9 @@ namespace ClientApp.MVVM.ViewModel
             }
         }
 
-        private RelayCommand? changePassword;
-
         public RelayCommand ChangePassword
         {
-            get => changePassword ??= new RelayCommand((ctrl) =>
+            get => changePassword ??= new RelayCommand(async (ctrl) =>
             {
                 Grid? grid = ctrl as Grid;
                 List<PasswordBox> pBoxes = grid!.Children.OfType<PasswordBox>().ToList();
@@ -70,7 +70,7 @@ namespace ClientApp.MVVM.ViewModel
                 string json = JsonConvert.SerializeObject(request);
                 byte[] requestBytes = Encoding.UTF8.GetBytes(json);
                 App app = (App)Application.Current;
-                byte[] responseBytes = app.SendRequestAndReceiveResponse(requestBytes);
+                byte[] responseBytes = await Task.Run(()=>app.SendRequestAndReceiveResponse(requestBytes));
                 json = Encoding.UTF8.GetString(responseBytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
                 if (response.Success)

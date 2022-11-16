@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ClientApp.MVVM.Model
 {
@@ -15,7 +16,7 @@ namespace ClientApp.MVVM.Model
             
         }
 
-        public List<HomeworkDataView> GetHomeworks(int? subjectId, DateTime? date)
+        public async Task<List<HomeworkDataView>> GetHomeworksAsync(int? subjectId, DateTime? date)
         {
             List<HomeworkDataView> homeworks = new List<HomeworkDataView>();
             if (subjectId == null && date == null)
@@ -26,7 +27,7 @@ namespace ClientApp.MVVM.Model
                     RequestOptions request = new RequestOptions() { RequestType = RequestType.GetHomeworks, GroupId = student.GroupId, SubjectId = subject.Id };
                     string json = JsonConvert.SerializeObject(request);
                     byte[] bytes = Encoding.UTF8.GetBytes(json);
-                    bytes = app.SendRequestAndReceiveResponse(bytes);
+                    bytes = await Task.Run(() => app.SendRequestAndReceiveResponse(bytes));
                     json = Encoding.UTF8.GetString(bytes);
                     ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
                     if (!response.Success)
@@ -41,7 +42,7 @@ namespace ClientApp.MVVM.Model
                 RequestOptions request = new RequestOptions() { RequestType = RequestType.GetHomeworks, GroupId = student.GroupId, SubjectId = subjectId };
                 string json = JsonConvert.SerializeObject(request);
                 byte[] bytes = Encoding.UTF8.GetBytes(json);
-                bytes = app.SendRequestAndReceiveResponse(bytes);
+                bytes = await Task.Run(() => app.SendRequestAndReceiveResponse(bytes));
                 json = Encoding.UTF8.GetString(bytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
                 if (!response.Success)
@@ -55,7 +56,7 @@ namespace ClientApp.MVVM.Model
                 RequestOptions request = new RequestOptions() { RequestType = RequestType.GetHomeworks, GroupId = student.GroupId, HomeworkDueDate = date.Value.Ticks };
                 string json = JsonConvert.SerializeObject(request);
                 byte[] bytes = Encoding.UTF8.GetBytes(json);
-                bytes = app.SendRequestAndReceiveResponse(bytes);
+                bytes = await Task.Run(() => app.SendRequestAndReceiveResponse(bytes));
                 json = Encoding.UTF8.GetString(bytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
                 if (!response.Success)
@@ -69,7 +70,7 @@ namespace ClientApp.MVVM.Model
                 RequestOptions request = new RequestOptions() { RequestType = RequestType.GetHomeworks, GroupId = student.GroupId, SubjectId = subjectId };
                 string json = JsonConvert.SerializeObject(request);
                 byte[] bytes = Encoding.UTF8.GetBytes(json);
-                bytes = app.SendRequestAndReceiveResponse(bytes);
+                bytes = await Task.Run(() => app.SendRequestAndReceiveResponse(bytes));
                 json = Encoding.UTF8.GetString(bytes);
                 ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
                 if (!response.Success)
@@ -80,7 +81,7 @@ namespace ClientApp.MVVM.Model
                 request = new RequestOptions() { RequestType = RequestType.GetHomeworks, GroupId = student.GroupId, HomeworkDueDate = date.Value.Ticks };
                 json = JsonConvert.SerializeObject(request);
                 bytes = Encoding.UTF8.GetBytes(json);
-                bytes = app.SendRequestAndReceiveResponse(bytes);
+                bytes = await Task.Run(() => app.SendRequestAndReceiveResponse(bytes));
                 json = Encoding.UTF8.GetString(bytes);
                 response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
                 if (!response.Success)
@@ -102,12 +103,12 @@ namespace ClientApp.MVVM.Model
             return result;
         }
 
-        public (byte[], string) DownloadHomeworkFileBytes(int homeworkId)
+        public async Task<(byte[], string)> DownloadHomeworkFileBytesAsync(int homeworkId)
         {
             RequestOptions request = new RequestOptions() { RequestType = RequestType.GetHomeworkFile, HomeworkId = homeworkId };
             string json = JsonConvert.SerializeObject(request);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
-            return app.DownloadFile(bytes);
+            return await Task.Run(() => app.DownloadFile(bytes));
         }
     }
 }

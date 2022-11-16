@@ -67,9 +67,9 @@ namespace ClientApp.MVVM.ViewModel
 
 		public RelayCommand GetLessons
 		{
-			get => getLessons ??= new RelayCommand((obj) =>
+			get => getLessons ??= new RelayCommand(async (obj) =>
 			{
-				LessonsView = model.GetLessonsView(SelectedSubjectId, IsDateIncluded ? Date : null);
+				LessonsView = await model.GetLessonsViewAsync(SelectedSubjectId, IsDateIncluded ? Date : null);
 			});
 			set
 			{

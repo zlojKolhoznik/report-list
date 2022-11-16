@@ -164,9 +164,9 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand GetHomeworks
         {
-            get => getHomeworks ??= new RelayCommand((obj) =>
+            get => getHomeworks ??= new RelayCommand(async (obj) =>
             {
-                Homeworks = model.GetHomeworksView(model.GetHomeworks(SelectedSubjectId, IsGroupUsed ? SelectedGroupId : null,  IsDateUsed ? Date : null));
+                Homeworks = await model.GetHomeworksViewAsync(await model.GetHomeworksAsync(SelectedSubjectId, IsGroupUsed ? SelectedGroupId : null,  IsDateUsed ? Date : null));
             });
             set
             {
@@ -180,14 +180,14 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand DownloadFile
         {
-            get => downloadFile ??= new RelayCommand(obj =>
+            get => downloadFile ??= new RelayCommand(async obj =>
             {
                 if (selectedHomeworkId == null)
                 {
                     MessageBox.Show("Select a homework first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                var fileData = model.DownloadHomeworkFileBytes((int)SelectedHomeworkId!);
+                var fileData = await model.DownloadHomeworkFileBytesAsync((int)SelectedHomeworkId!);
                 SaveFileDialog sfd = new SaveFileDialog() { Filter = $"Homework|{fileData.Item2}", FileName = $"Homework_{DateTime.Now:ddMMyyyyHHmmss}{fileData.Item2}" };
                 if (sfd.ShowDialog() == true)
                 {
@@ -208,7 +208,7 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand AddHomework
         {
-            get => addHomework ??= new RelayCommand(obj => 
+            get => addHomework ??= new RelayCommand(async obj => 
             {
                 AddHomeworkDialog ahd = new AddHomeworkDialog(Groups, Subjects.Where(s => s.Id != null).ToList());
                 if (ahd.ShowDialog() == true)
@@ -222,7 +222,7 @@ namespace ClientApp.MVVM.ViewModel
                     }
                     try
                     {
-                        model.AddHomework((int)ahd.SelectedSubjectId!, (int)ahd.SelectedGroupId!, (DateTime)ahd.Date!, bytes, ext);
+                        await model.AddHomeworkAsync((int)ahd.SelectedSubjectId!, (int)ahd.SelectedGroupId!, (DateTime)ahd.Date!, bytes, ext);
                     }
                     catch(Exception ex)
                     {

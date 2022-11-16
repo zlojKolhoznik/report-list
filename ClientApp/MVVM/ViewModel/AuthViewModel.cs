@@ -59,10 +59,7 @@ namespace ClientApp.MVVM.ViewModel
 					ErrorMessage = "Cannot connect to the server. Try again";
 					return;
 				}
-				byte[] responseBytes = await Task.Run(() =>
-				{
-					return app.SendRequestAndReceiveResponse(request);
-				});
+				byte[] responseBytes = await Task.Run(() => app.SendRequestAndReceiveResponse(request));
 				json = Encoding.UTF8.GetString(responseBytes);
 				ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
 				if (response.Success)
@@ -76,7 +73,7 @@ namespace ClientApp.MVVM.ViewModel
 				}
 				else
 				{
-					ErrorMessage = response.ErrorMessage;
+					ErrorMessage = response.ErrorMessage!;
 				}
 			});
 			set

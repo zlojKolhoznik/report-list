@@ -5,6 +5,7 @@ using Networking.DataViews;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
@@ -21,7 +22,7 @@ namespace ClientApp.MVVM.ViewModel
         private RelayCommand? downloadFile;
         private RelayCommand? getHomeworks;
 
-        public StudentsHomeworksViewModel()
+        public  StudentsHomeworksViewModel()
         {
             model = new StudentsHomeworksModel();
             Subjects = model.GetSubjects();
@@ -111,9 +112,9 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand GetHomeworks
         {
-            get => getHomeworks ??= new RelayCommand((obj) =>
+            get => getHomeworks ??= new RelayCommand(async (obj) =>
             {
-                Homeworks = model.GetHomeworksView(model.GetHomeworks(SelectedSubjectId, IsDateUsed ? date : null));
+                Homeworks = model.GetHomeworksView(await model.GetHomeworksAsync(SelectedSubjectId, IsDateUsed ? date : null));
             });
             set
             {
@@ -127,14 +128,14 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand DownloadFile
         {
-            get => downloadFile ??= new RelayCommand(obj =>
+            get => downloadFile ??= new RelayCommand(async obj =>
             {
                 if (selectedHomeworkId == null)
                 {
                     MessageBox.Show("Select a homework first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                var fileData = model.DownloadHomeworkFileBytes((int)SelectedHomeworkId!);
+                var fileData = await model.DownloadHomeworkFileBytesAsync((int)SelectedHomeworkId!);
                 SaveFileDialog sfd = new SaveFileDialog() { Filter = $"Homework|{fileData.Item2}", FileName = $"Homework_{DateTime.Now:ddMMyyyyHHmmss}{fileData.Item2}" };
                 if (sfd.ShowDialog() == true)
                 {

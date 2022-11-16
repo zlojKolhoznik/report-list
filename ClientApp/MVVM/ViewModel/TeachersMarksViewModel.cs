@@ -104,9 +104,9 @@ namespace ClientApp.MVVM.ViewModel
 
 		public RelayCommand GetMarks
 		{
-			get => getMarks ??= new RelayCommand((obj) =>
+			get => getMarks ??= new RelayCommand(async (obj) =>
 			{
-				MarksViews = model.GetMarksViews(SelectedGroupId, SelectedSubjectId);
+				MarksViews = await model.GetMarksViewsAsync(SelectedGroupId, SelectedSubjectId);
             });
 			set
 			{
@@ -120,23 +120,22 @@ namespace ClientApp.MVVM.ViewModel
 
 		public RelayCommand AddMark
 		{
-			get => addMark ??= new RelayCommand((obj) =>
+			get => addMark ??= new RelayCommand(async (obj) =>
 			{
-				List<HomeworkDataView> homeworks = model.GetHomeworks();
-				List<GroupDataView> groups = model.GetGroups();
+				List<HomeworkDataView> homeworks = await model.GetHomeworksAsync();
 				Dictionary<int, string> pairs = new Dictionary<int, string>();
 				foreach (var homework in homeworks)
 				{
 					pairs.Add(homework.Id, $"{groups.Single(g=>g.Id == homework.GroupId).Name} з {homework.Subject} до {new DateTime(homework.DueDate).ToShortDateString()}");
 				}
 
-                AddMarkDialog amd = new AddMarkDialog(model.GetLessons(), pairs, model.GetStudents());
+                AddMarkDialog amd = new AddMarkDialog(await model.GetLessonsAsync(), pairs, await model.GetStudentsAsync());
 				if (amd.ShowDialog() == true)
 				{
 					try
 					{
 						AddMarkViewModel amvm = (AddMarkViewModel)amd.DataContext;
-						model.AddMark(int.Parse(amvm.MarkString), amvm.SelectedStudentId, amvm.SelectedHomeworkId, amvm.SelectedLessonId);
+						await model.AddMarkAsync(int.Parse(amvm.MarkString), amvm.SelectedStudentId, amvm.SelectedHomeworkId, amvm.SelectedLessonId);
 					}
 					catch (Exception ex)
 					{

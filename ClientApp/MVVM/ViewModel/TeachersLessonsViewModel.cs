@@ -129,11 +129,11 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand GetLessons
         {
-            get => getLessons ??= new RelayCommand((obj) =>
+            get => getLessons ??= new RelayCommand(async (obj) =>
             {
                 try
                 {
-                    LessonsView = model.GetLessons(SelectedSubjectId, SelectedGroupId, IsDateIncluded ? Date : null);
+                    LessonsView = await model.GetLessonsAsync(SelectedSubjectId, SelectedGroupId, IsDateIncluded ? Date : null);
                 }
                 catch (ArgumentNullException ex)
                 {

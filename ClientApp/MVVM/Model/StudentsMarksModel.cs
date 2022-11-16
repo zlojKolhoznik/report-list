@@ -1,5 +1,4 @@
-﻿using Networking.DataViews;
-using Networking.Requests;
+﻿using Networking.Requests;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace ClientApp.MVVM.Model
 
         }
 
-        internal List<string> GetMarksViews()
+        public List<string> GetMarksViews()
         {
             var result = new List<string>();
             RequestOptions request = new RequestOptions() { RequestType = RequestType.GetMarks, StudId = student.Id };
