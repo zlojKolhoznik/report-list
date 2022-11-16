@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Portianko_Kursova\bin\Debug\net6.0-windows\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\ServerApp\bin\Debug\net6.0-windows\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
 
