@@ -54,7 +54,7 @@ namespace ClientApp.MVVM.Model
                 List<LessonDataView> lessonsForSubject = response.Lessons!.ToList();
                 foreach (var lesson in lessonsForDate.IntersectBy(lessonsForSubject.Select(l=>l.Id), l=>l.Id))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }

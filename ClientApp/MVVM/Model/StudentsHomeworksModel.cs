@@ -97,7 +97,7 @@ namespace ClientApp.MVVM.Model
             Dictionary<int, string> result = new Dictionary<int, string>();
             foreach (var homework in homeworks)
             {
-                result.Add(homework.Id, $"Завдання з {homework.Subject} до {new DateTime(homework.DueDate).ToString("dd.MM HH:mm")}");
+                result.Add(homework.Id, $"Завдання з {homework.Subject} до {new DateTime(homework.DueDate):dd.MM HH:mm}");
             }
             return result;
         }
