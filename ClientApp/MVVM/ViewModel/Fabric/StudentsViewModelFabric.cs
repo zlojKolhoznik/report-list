@@ -4,7 +4,7 @@
     {
         public override HomeworksViewModel CreateHomeworksViewModel()
         {
-            return new StudentHomeworksViewModel();
+            return new StudentsHomeworksViewModel();
         }
 
         public override LessonsViewModel CreateLessonsViewModel()

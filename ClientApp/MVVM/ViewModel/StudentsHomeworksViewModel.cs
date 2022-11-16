@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
 {
-    internal class StudentHomeworksViewModel : HomeworksViewModel
+    internal class StudentsHomeworksViewModel : HomeworksViewModel
     {
         private StudentsHomeworksModel model;
         private List<SubjectDataView> subjects;
@@ -21,7 +21,7 @@ namespace ClientApp.MVVM.ViewModel
         private RelayCommand? downloadFile;
         private RelayCommand? getHomeworks;
 
-        public StudentHomeworksViewModel()
+        public StudentsHomeworksViewModel()
         {
             model = new StudentsHomeworksModel();
             Subjects = model.GetSubjects();
