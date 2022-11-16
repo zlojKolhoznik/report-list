@@ -26,14 +26,14 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type vm:StudentsLessonsViewModel}">
-                <view:StudentLessons/>
+                <view:StudentsLessons/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type vm:TeachersLessonsViewModel}">
                 <view:TeachersLessons/>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type vm:StudentHomeworksViewModel}">
+            <DataTemplate DataType="{x:Type vm:StudentsHomeworksViewModel}">
                 <view:StudentsHomeworks/>
             </DataTemplate>
 

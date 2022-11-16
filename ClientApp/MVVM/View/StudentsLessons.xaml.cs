@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ClientApp.MVVM.View
 {
     /// <summary>
-    /// Interaction logic for StudentLessons.xaml
+    /// Interaction logic for StudentsLessons.xaml
     /// </summary>
-    public partial class StudentLessons : UserControl
+    public partial class StudentsLessons : UserControl
     {
-        public StudentLessons()
+        public StudentsLessons()
         {
             InitializeComponent();
         }
