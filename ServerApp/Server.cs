@@ -1,7 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using Networking;
-using Networking.NetTools;
 using Networking.DataViews;
 using Networking.Requests;
 using Newtonsoft.Json;

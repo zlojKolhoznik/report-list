@@ -1,6 +1,5 @@
 ﻿using ClientApp.Core;
 using Networking.DataViews;
-using System;
 using System.Collections.Generic;
 
 namespace ClientApp.MVVM.ViewModel

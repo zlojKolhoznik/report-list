@@ -1,6 +1,5 @@
 ﻿using ClientApp.Core;
 using ClientApp.MVVM.View;
-using Networking;
 using Networking.NetTools;
 using Networking.Requests;
 using Newtonsoft.Json;
