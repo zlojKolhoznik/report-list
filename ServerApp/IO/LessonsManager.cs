@@ -101,7 +101,7 @@ namespace ServerApp.IO
         /// </summary>
         /// <param name="lesson">Lesson to add</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public async void AddLesson(Lesson lesson, List<Group> groups)
+        public void AddLesson(Lesson lesson, List<Group> groups)
         {
             using (var context = new ReportlistContext())
             {

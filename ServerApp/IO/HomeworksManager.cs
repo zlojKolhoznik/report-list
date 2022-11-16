@@ -162,7 +162,7 @@ namespace ServerApp.IO
 
         public string GetHomeworkFileExtension(Homework homework)
         {
-            string result;
+            string? result;
             using (var context = new ReportlistContext())
             {
                 result = context.Homeworks.FirstOrDefault(hw => hw.Id == homework.Id)?.FileExtension;
