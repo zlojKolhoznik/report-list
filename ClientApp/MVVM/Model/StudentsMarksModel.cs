@@ -4,29 +4,14 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows;
 
 namespace ClientApp.MVVM.Model
 {
-    internal class StudentsMarksModel
+    internal class StudentsMarksModel : StudentsModel
     {
-        private StudentDataView student;
-        private App app;
-
-        public StudentsMarksModel()
+        public StudentsMarksModel() : base()
         {
-            app = (App)Application.Current;
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetStudent, UserId = app.User!.Id };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            student = response.Student!;
+
         }
 
         internal List<string> GetMarksViews()

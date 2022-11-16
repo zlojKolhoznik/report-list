@@ -5,37 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
 
 namespace ClientApp.MVVM.Model
 {
-    internal class StudentsLessonsModel
+    internal class StudentsLessonsModel : StudentsModel
     {
-        private App app;
-        private StudentDataView student;
-
-        public StudentsLessonsModel()
+        public StudentsLessonsModel() : base()
         {
-            app = (App)Application.Current;
-            student = GetStudent(app.User!.Id);
+
         }
 
         public StudentDataView Student => student;
-
-        public List<SubjectDataView> GetSubjects()
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetSubjects, GroupId = student.GroupId };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Subjects!;
-        }
 
         public List<string> GetLessonsView(int? subjectId = null, DateTime? date = null)
         {
@@ -114,21 +94,6 @@ namespace ClientApp.MVVM.Model
                 }
                 return result;
             }
-        }
-
-        private StudentDataView GetStudent(int userId)
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetStudent, UserId = userId };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Student!;
         }
     }
 }
