@@ -133,7 +133,7 @@ namespace ClientApp.MVVM.ViewModel
             {
                 try
                 {
-                    LessonsView = model.GetLesons(SelectedSubjectId, SelectedGroupId, IsDateIncluded ? Date : null);
+                    LessonsView = model.GetLessons(SelectedSubjectId, SelectedGroupId, IsDateIncluded ? Date : null);
                 }
                 catch (ArgumentNullException ex)
                 {

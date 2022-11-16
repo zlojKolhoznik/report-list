@@ -24,5 +24,8 @@ namespace Networking.DataViews
 
         [JsonProperty("subject")]
         public string Subject { get; set; }
+
+        [JsonProperty("subjectId")]
+        public int SubjectId { get; set; }
     }
 }

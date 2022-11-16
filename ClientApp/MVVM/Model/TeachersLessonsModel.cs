@@ -60,7 +60,7 @@ namespace ClientApp.MVVM.Model
             return response.Subjects!.Where(s=>teacher.SubjectsIds.Contains((int)s.Id!)).ToList();
         }
 
-        public List<string> GetLesons(int? subjectId = null, int? groupId = null, DateTime? date = null)
+        public List<string> GetLessons(int? subjectId = null, int? groupId = null, DateTime? date = null)
         {
             if (subjectId == null && groupId == null && date == null)
             {

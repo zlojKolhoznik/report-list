@@ -55,14 +55,7 @@ namespace ServerApp
                             Console.WriteLine("Invalid requests");
                             continue;
                         }
-                        if (options.RequestType != RequestType.GetHomeworkFile)
-                        {
-                            ResponseOptions response = ProcessRequest(options);
-                            string responseJson = JsonConvert.SerializeObject(response, Formatting.Indented);
-                            responseBytes = Encoding.UTF8.GetBytes(responseJson);
-                            ns.Write(responseBytes);
-                        }
-                        else
+                        if (options.RequestType == RequestType.GetHomeworkFile)
                         {
                             HomeworksManager hwm = new HomeworksManager();
                             Homework hw = new Homework() { Id = (int)options.HomeworkId! };
@@ -88,6 +81,43 @@ namespace ServerApp
                                     ns.Write(buffer, 0, size);
                                 }
                             }
+                        }
+                        else if (options.RequestType == RequestType.AddHomework)
+                        {
+                            int buffSize = 1024;
+                            byte[] buff = new byte[buffSize];
+                            byte[] result;
+                            string ext;
+                            ns.Read(buff, 0, buff.Length);
+                            string json = Encoding.UTF8.GetString(buff);
+                            Dictionary<string, string> headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(json)!;
+                            int len = int.Parse(headers["Content-Length"]);
+                            ext = headers["File-Extension"];
+                            result = new byte[len];
+                            using (MemoryStream ms = new MemoryStream(result))
+                            {
+                                while (len > 0)
+                                {
+                                    byte[] buffer = new byte[buffSize];
+                                    int size = ns.Read(buffer, 0, buffer.Length);
+                                    ms.Write(buffer, 0, size);
+                                    len -= size;
+                                }
+                            }
+
+                            options.HomeworkFileData = result;
+                            options.HomeworkFileExtension = ext;
+                            ResponseOptions response = AddHomework(options);
+                            string responseJson = JsonConvert.SerializeObject(response, Formatting.Indented);
+                            responseBytes = Encoding.UTF8.GetBytes(responseJson);
+                            ns.Write(responseBytes);
+                        }
+                        else
+                        {
+                            ResponseOptions response = ProcessRequest(options);
+                            string responseJson = JsonConvert.SerializeObject(response, Formatting.Indented);
+                            responseBytes = Encoding.UTF8.GetBytes(responseJson);
+                            ns.Write(responseBytes);
                         }
                         sender.Close();
                     }
@@ -441,7 +471,7 @@ namespace ServerApp
             {
                 return new ResponseOptions() { Success = false, ErrorMessage = "Required information is not provided" };
             }
-            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, GroupId = hw.GroupId, TeacherId = hw.TeacherId, Subject = hw.Subject.Name }).ToList();
+            views = homeworks.Select(hw => new HomeworkDataView() { Id = hw.Id, DueDate = hw.DueDate.Ticks, GroupId = hw.GroupId, TeacherId = hw.TeacherId, Subject = hw.Subject.Name, SubjectId = hw.SubjectId }).ToList();
             return new ResponseOptions() { Success = true, Homeworks = views };
         }
 

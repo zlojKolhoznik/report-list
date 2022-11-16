@@ -4,11 +4,7 @@ using Microsoft.Win32;
 using Networking.DataViews;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
