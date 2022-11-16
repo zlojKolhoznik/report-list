@@ -11,7 +11,7 @@ namespace ClientApp.MVVM.ViewModel
 {
     internal class StudentHomeworksViewModel : HomeworksViewModel
     {
-        private StudentHomeworkModel model;
+        private StudentsHomeworksModel model;
         private List<SubjectDataView> subjects;
         private Dictionary<int, string>? homeworks;
         private bool isDateUsed;
@@ -23,7 +23,7 @@ namespace ClientApp.MVVM.ViewModel
 
         public StudentHomeworksViewModel()
         {
-            model = new StudentHomeworkModel();
+            model = new StudentsHomeworksModel();
             Subjects = model.GetSubjects();
             Subjects.Insert(0, new SubjectDataView() { Id = null, Name = "Будь-який" });
             IsDateUsed = true;
