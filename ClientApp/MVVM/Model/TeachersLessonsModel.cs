@@ -5,66 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
 
 namespace ClientApp.MVVM.Model
 {
-    class TeachersLessonsModel
+    class TeachersLessonsModel : TeachersModel
     {
-        App app;
-        TeacherDataView teacher;
-
-        public TeachersLessonsModel()
+        public TeachersLessonsModel() : base()
         {
-            app = (App)Application.Current;
-            teacher = GetTeacher(app.User!.Id);
-        }
-
-        public TeacherDataView Teacher => teacher;
-
-        private TeacherDataView GetTeacher(int userId)
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetTeacher, UserId = userId };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Teacher!;
-        }
-
-        public List<GroupDataView> GetGroups()
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetGroups, TeacherId = teacher.Id };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Groups!;
-        }
-
-        public List<SubjectDataView> GetSubjects(GroupDataView group)
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetSubjects, GroupId = group.Id };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Subjects!.Where(s=>teacher.SubjectsIds.Contains((int)s.Id!)).ToList();
+            
         }
 
         public List<string> GetLessons(int? subjectId = null, int? groupId = null, DateTime? date = null)
@@ -82,7 +30,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in temp.IntersectBy(lessonsDate.Select(l => l.Id), l => l.Id))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }
@@ -93,7 +41,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in lessonsSubject.IntersectBy(lessonsGroup.Select(l => l.Id), l => l.Id))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }
@@ -104,7 +52,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in lessonsSubject.IntersectBy(lessonsDate.Select(l => l.Id), l => l.Id))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }
@@ -115,7 +63,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in lessonsDate.IntersectBy(lessonsGroup.Select(l => l.Id), l => l.Id))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }
@@ -124,7 +72,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in GetLessonsBySubject((int)subjectId))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }
@@ -133,7 +81,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in GetLessonsByGroup((int)groupId))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }
@@ -142,7 +90,7 @@ namespace ClientApp.MVVM.Model
                 List<string> result = new List<string>();
                 foreach (var lesson in GetLessonsByDate((DateTime)date))
                 {
-                    result.Add($"{new DateTime(lesson.Date).ToString("dd.MM HH:mm")}. {lesson.Topic}");
+                    result.Add($"{new DateTime(lesson.Date):dd.MM HH:mm}. {lesson.Topic}");
                 }
                 return result;
             }

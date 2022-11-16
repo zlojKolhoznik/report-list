@@ -4,67 +4,15 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
 using System;
-using System.Windows;
 using System.Linq;
 
 namespace ClientApp.MVVM.Model
 {
-    internal class TeachersHomeworksModel
+    internal class TeachersHomeworksModel : TeachersModel
     {
-        private App app;
-        private TeacherDataView teacher;
-
-        public TeachersHomeworksModel()
+        public TeachersHomeworksModel() : base()
         {
-            app = (App)Application.Current;
-            teacher = GetTeacher(app.User!.Id);
-        }
-
-        public TeacherDataView Teacher => teacher;
-
-        private TeacherDataView GetTeacher(int userId)
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetTeacher, UserId = userId };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Teacher!;
-        }
-
-        public List<GroupDataView> GetGroups()
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetGroups, TeacherId = teacher.Id };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Groups!;
-        }
-
-        public List<SubjectDataView> GetSubjects(GroupDataView group)
-        {
-            RequestOptions request = new RequestOptions() { RequestType = RequestType.GetSubjects, GroupId = group.Id };
-            string json = JsonConvert.SerializeObject(request);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            bytes = app.SendRequestAndReceiveResponse(bytes);
-            json = Encoding.UTF8.GetString(bytes);
-            ResponseOptions response = JsonConvert.DeserializeObject<ResponseOptions>(json)!;
-            if (!response.Success)
-            {
-                throw new Exception(response.ErrorMessage);
-            }
-            return response.Subjects!.Where(s => teacher.SubjectsIds.Contains((int)s.Id!)).ToList();
+            
         }
 
         public List<HomeworkDataView> GetHomeworks(int? subjectId, int? groupId, DateTime? date)
@@ -140,9 +88,10 @@ namespace ClientApp.MVVM.Model
         public Dictionary<int, string> GetHomeworksView(List<HomeworkDataView> homeworks)
         {
             Dictionary<int, string> result = new Dictionary<int, string>();
+            List<GroupDataView> groups = GetGroups();
             foreach (var homework in homeworks)
             {
-                result.Add(homework.Id, $"Завдання з {homework.Subject} до {new DateTime(homework.DueDate):dd.MM HH:mm}");
+                result.Add(homework.Id, $"Завдання для {groups.First(g => g.Id == homework.Id).Name} з {homework.Subject} до {new DateTime(homework.DueDate):dd.MM HH:mm}");
             }
             return result;
         }
