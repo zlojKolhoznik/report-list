@@ -3,6 +3,7 @@ using ClientApp.MVVM.Model;
 using Networking.DataViews;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
 {
@@ -69,7 +70,14 @@ namespace ClientApp.MVVM.ViewModel
 		{
 			get => getLessons ??= new RelayCommand(async (obj) =>
 			{
-				LessonsView = await model.GetLessonsViewAsync(SelectedSubjectId, IsDateIncluded ? Date : null);
+				try
+				{
+					LessonsView = await model.GetLessonsViewAsync(SelectedSubjectId, IsDateIncluded ? Date : null);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
 			});
 			set
 			{

@@ -73,9 +73,9 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand? ShowPersonalInfo
         {
-            get => showPersonalInfo ??= new RelayCommand((obj) =>
+            get => showPersonalInfo ??= new RelayCommand(async (obj) =>
             {
-                CurrentViewModel = new PersonalInfoViewModel();
+                CurrentViewModel = await Task.Run(() =>  new PersonalInfoViewModel());
             });
             set
             {
@@ -114,9 +114,9 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand ShowMarks
         {
-            get => showMarks ??= new RelayCommand((obj) =>
+            get => showMarks ??= new RelayCommand(async (obj) =>
             {
-                CurrentViewModel = ViewModelFabric.CreateMarksViewModel();
+                CurrentViewModel = await Task.Run(() => ViewModelFabric.CreateMarksViewModel());
             });
             set
             {
@@ -130,9 +130,9 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand ShowLessons
         {
-            get => showLessons ??= new RelayCommand((obj) =>
+            get => showLessons ??= new RelayCommand(async (obj) => 
             {
-                CurrentViewModel = ViewModelFabric.CreateLessonsViewModel();
+                CurrentViewModel = await Task.Run(() => ViewModelFabric.CreateLessonsViewModel()); 
             });
             set
             {
@@ -146,9 +146,9 @@ namespace ClientApp.MVVM.ViewModel
 
         public RelayCommand ShowHomeworks
         {
-            get => showHomeworks ??= new RelayCommand((obj) =>
+            get => showHomeworks ??= new RelayCommand(async (obj) => 
             {
-                CurrentViewModel = ViewModelFabric.CreateHomeworksViewModel();
+                CurrentViewModel = await Task.Run(() => ViewModelFabric.CreateHomeworksViewModel()); 
             });
             set
             {

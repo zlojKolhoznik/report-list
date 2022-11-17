@@ -166,7 +166,14 @@ namespace ClientApp.MVVM.ViewModel
         {
             get => getHomeworks ??= new RelayCommand(async (obj) =>
             {
-                Homeworks = await model.GetHomeworksViewAsync(await model.GetHomeworksAsync(SelectedSubjectId, IsGroupUsed ? SelectedGroupId : null,  IsDateUsed ? Date : null));
+                try
+                {
+                    Homeworks = await model.GetHomeworksViewAsync(await model.GetHomeworksAsync(SelectedSubjectId, IsGroupUsed ? SelectedGroupId : null, IsDateUsed ? Date : null));
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             });
             set
             {
@@ -182,18 +189,25 @@ namespace ClientApp.MVVM.ViewModel
         {
             get => downloadFile ??= new RelayCommand(async obj =>
             {
-                if (selectedHomeworkId == null)
+                try
                 {
-                    MessageBox.Show("Select a homework first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    if (selectedHomeworkId == null)
+                    {
+                        MessageBox.Show("Select a homework first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    var fileData = await model.DownloadHomeworkFileBytesAsync((int)SelectedHomeworkId!);
+                    SaveFileDialog sfd = new SaveFileDialog() { Filter = $"Homework|{fileData.Item2}", FileName = $"Homework_{DateTime.Now:ddMMyyyyHHmmss}{fileData.Item2}" };
+                    if (sfd.ShowDialog() == true)
+                    {
+                        string path = sfd.FileName;
+                        File.WriteAllBytes(path, fileData.Item1);
+                        System.Diagnostics.Process.Start("explorer.exe", $"/select, \"{path}\"");
+                    }
                 }
-                var fileData = await model.DownloadHomeworkFileBytesAsync((int)SelectedHomeworkId!);
-                SaveFileDialog sfd = new SaveFileDialog() { Filter = $"Homework|{fileData.Item2}", FileName = $"Homework_{DateTime.Now:ddMMyyyyHHmmss}{fileData.Item2}" };
-                if (sfd.ShowDialog() == true)
+                catch (Exception ex)
                 {
-                    string path = sfd.FileName;
-                    File.WriteAllBytes(path, fileData.Item1);
-                    System.Diagnostics.Process.Start("explorer.exe", $"/select, \"{path}\"");
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             });
             set

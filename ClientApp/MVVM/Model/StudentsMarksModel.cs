@@ -30,7 +30,7 @@ namespace ClientApp.MVVM.Model
             {
                 if (mark.Lesson != null)
                 {
-                    result.Add($"{mark.Homework!.Subject} Lesson {new DateTime(mark.Lesson.Date).ToShortDateString()} - {mark.Value}");
+                    result.Add($"{mark.Lesson!.Subject} Lesson {new DateTime(mark.Lesson.Date).ToShortDateString()} - {mark.Value}");
                 }
                 else
                 {

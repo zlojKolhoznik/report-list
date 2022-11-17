@@ -122,25 +122,24 @@ namespace ClientApp.MVVM.ViewModel
 		{
 			get => addMark ??= new RelayCommand(async (obj) =>
 			{
-				List<HomeworkDataView> homeworks = await model.GetHomeworksAsync();
-				Dictionary<int, string> pairs = new Dictionary<int, string>();
-				foreach (var homework in homeworks)
+				try
 				{
-					pairs.Add(homework.Id, $"{groups.Single(g=>g.Id == homework.GroupId).Name} з {homework.Subject} до {new DateTime(homework.DueDate).ToShortDateString()}");
-				}
-
-                AddMarkDialog amd = new AddMarkDialog(await model.GetLessonsAsync(), pairs, await model.GetStudentsAsync());
-				if (amd.ShowDialog() == true)
-				{
-					try
+					List<HomeworkDataView> homeworks = await model.GetHomeworksAsync();
+					Dictionary<int, string> pairs = new Dictionary<int, string>();
+					foreach (var homework in homeworks)
+					{
+						pairs.Add(homework.Id, $"{groups.Single(g => g.Id == homework.GroupId).Name} з {homework.Subject} до {new DateTime(homework.DueDate).ToShortDateString()}");
+					}
+					AddMarkDialog amd = new AddMarkDialog(await model.GetLessonsAsync(), pairs, await model.GetStudentsAsync());
+					if (amd.ShowDialog() == true)
 					{
 						AddMarkViewModel amvm = (AddMarkViewModel)amd.DataContext;
 						await model.AddMarkAsync(int.Parse(amvm.MarkString), amvm.SelectedStudentId, amvm.SelectedHomeworkId, amvm.SelectedLessonId);
 					}
-					catch (Exception ex)
-					{
-						MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			});
 			set

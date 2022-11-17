@@ -114,7 +114,14 @@ namespace ClientApp.MVVM.ViewModel
         {
             get => getHomeworks ??= new RelayCommand(async (obj) =>
             {
-                Homeworks = model.GetHomeworksView(await model.GetHomeworksAsync(SelectedSubjectId, IsDateUsed ? date : null));
+                try
+                {
+                    Homeworks = model.GetHomeworksView(await model.GetHomeworksAsync(SelectedSubjectId, IsDateUsed ? date : null));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             });
             set
             {
@@ -135,7 +142,16 @@ namespace ClientApp.MVVM.ViewModel
                     MessageBox.Show("Select a homework first", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                var fileData = await model.DownloadHomeworkFileBytesAsync((int)SelectedHomeworkId!);
+                (byte[], string) fileData;
+                try
+                {
+                    fileData = await model.DownloadHomeworkFileBytesAsync((int)SelectedHomeworkId!);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
                 SaveFileDialog sfd = new SaveFileDialog() { Filter = $"Homework|{fileData.Item2}", FileName = $"Homework_{DateTime.Now:ddMMyyyyHHmmss}{fileData.Item2}" };
                 if (sfd.ShowDialog() == true)
                 {
