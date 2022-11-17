@@ -1,3 +1,5 @@
+using AdminPanel.Forms;
+
 namespace AdminPanel
 {
     internal static class Program
