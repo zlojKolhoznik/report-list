@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace ClientApp.MVVM.Model
 {
-    internal class StudentsModel
+    internal abstract class StudentsModel
     {
         protected App app;
         protected StudentDataView student;
