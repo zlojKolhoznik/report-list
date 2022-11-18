@@ -20,8 +20,6 @@ namespace ClientApp.MVVM.Model
             teacher = GetTeacher(app.User!.Id);
         }
 
-        public TeacherDataView Teacher => teacher;
-
         public List<GroupDataView> GetGroups()
         {
             RequestOptions request = new RequestOptions() { RequestType = RequestType.GetGroups, TeacherId = teacher.Id };

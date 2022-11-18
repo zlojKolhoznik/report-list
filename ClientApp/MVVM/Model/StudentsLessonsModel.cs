@@ -16,8 +16,6 @@ namespace ClientApp.MVVM.Model
 
         }
 
-        public StudentDataView Student => student;
-
         public async Task<List<string>> GetLessonsViewAsync(int? subjectId = null, DateTime? date = null)
         {
             if (subjectId == null && date == null)
