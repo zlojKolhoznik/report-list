@@ -92,7 +92,7 @@ namespace ClientApp.MVVM.Model
             List<GroupDataView> groups = await Task.Run(() => GetGroups());
             foreach (var homework in homeworks)
             {
-                result.Add(homework.Id, $"Завдання для {groups.First(g => g.Id == homework.Id).Name} з {homework.Subject} до {new DateTime(homework.DueDate):dd.MM HH:mm}");
+                result.Add(homework.Id, $"Завдання для {groups.First(g => g.Id == homework.GroupId).Name} з {homework.Subject} до {new DateTime(homework.DueDate):dd.MM HH:mm}");
             }
             return result;
         }
