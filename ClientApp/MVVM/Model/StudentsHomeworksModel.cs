@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ClientApp.MVVM.Model
 {
@@ -19,6 +20,10 @@ namespace ClientApp.MVVM.Model
         public async Task<List<HomeworkDataView>> GetHomeworksAsync(int? subjectId, DateTime? date)
         {
             List<HomeworkDataView> homeworks = new List<HomeworkDataView>();
+            if (!(await app.CanConnect()))
+            {
+                throw new Exception("Cannot connect to the server.");
+            }
             if (subjectId == null && date == null)
             {
                 List<SubjectDataView> subjects = GetSubjects();
@@ -108,6 +113,10 @@ namespace ClientApp.MVVM.Model
             RequestOptions request = new RequestOptions() { RequestType = RequestType.GetHomeworkFile, HomeworkId = homeworkId };
             string json = JsonConvert.SerializeObject(request);
             byte[] bytes = Encoding.UTF8.GetBytes(json);
+            if (!(await app.CanConnect()))
+            {
+                throw new Exception("Cannot connect to the server.");
+            }
             return await Task.Run(() => app.DownloadFile(bytes));
         }
     }

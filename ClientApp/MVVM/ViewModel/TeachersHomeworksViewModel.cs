@@ -29,20 +29,28 @@ namespace ClientApp.MVVM.ViewModel
 
         public TeachersHomeworksViewModel()
         {
-            model = new TeachersHomeworksModel();
-            Groups = model.GetGroups();
-            Subjects = new List<SubjectDataView>();
-            foreach (var group in Groups)
+            try
             {
-                var temp = model.GetSubjects(group);
-                Subjects.AddRange(temp.ExceptBy(Subjects.Select(s => s.Id), s => s.Id));
+                model = new TeachersHomeworksModel();
+                Groups = model.GetGroups();
+                Subjects = new List<SubjectDataView>();
+                foreach (var group in Groups)
+                {
+                    var temp = model.GetSubjects(group);
+                    Subjects.AddRange(temp.ExceptBy(Subjects.Select(s => s.Id), s => s.Id));
+                }
+                Subjects.Insert(0, new SubjectDataView() { Id = null, Name = "Будь-який" });
+                IsDateUsed = true;
+                IsGroupUsed = true;
+                SelectedSubjectId = null;
+                SelectedHomeworkId = null;
+                SelectedGroupId = Groups.FirstOrDefault()?.Id;
             }
-            Subjects.Insert(0, new SubjectDataView() { Id = null, Name = "Будь-який" });
-            IsDateUsed = true;
-            IsGroupUsed= true;
-            SelectedSubjectId = null;
-            SelectedHomeworkId = null;
-            SelectedGroupId = Groups.FirstOrDefault()?.Id;
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The app will close. Try using it later");
+            }
         }
 
         public bool IsGroupUsed

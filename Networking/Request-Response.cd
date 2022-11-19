@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Networking.Requests.RequestOptions">
+    <Position X="3" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMAABAAEMAAAEEAgEABmCAgASAAQAEACAgAQACAAgAE=</HashCode>
+      <FileName>Requests\RequestOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Networking.Requests.ResponseOptions">
+    <Position X="4.75" Y="1" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQMBAEAAQAAAAAAAAAAAAAAAAgAAAAAAAAwQAQAAgAA=</HashCode>
+      <FileName>Requests\ResponseOptions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Networking.Requests.RequestType">
+    <Position X="1" Y="1" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAEKAAEABQAQgDBgBIAAAAAADAAhChANAIJAUIHAAAA=</HashCode>
+      <FileName>Requests\RequestType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

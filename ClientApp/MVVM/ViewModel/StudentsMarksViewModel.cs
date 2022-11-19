@@ -1,5 +1,7 @@
 ﻿using ClientApp.MVVM.Model;
+using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
 {
@@ -10,8 +12,16 @@ namespace ClientApp.MVVM.ViewModel
 
 		public StudentsMarksViewModel()
 		{
-			model = new StudentsMarksModel();
-			marksViews = model.GetMarksViews();
+			try
+			{
+				model = new StudentsMarksModel();
+				marksViews = model.GetMarksViews();
+			}
+			catch (Exception ex)
+			{
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The app will close. Try using it later");
+            }
 		}
 
 		public List<string> MarksViews

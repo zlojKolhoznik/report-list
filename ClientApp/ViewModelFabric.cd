@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ClientApp.MVVM.ViewModel.Fabric.ViewModelFabric">
+    <Position X="3" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAQAAAAAAAAgAAA=</HashCode>
+      <FileName>MVVM\ViewModel\Fabric\ViewModelFabric.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.Fabric.TeachersViewModelFabric">
+    <Position X="0.5" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAQAAAAAAAAgAAA=</HashCode>
+      <FileName>MVVM\ViewModel\Fabric\TeachersViewModelFabric.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.Fabric.StudentsViewModelFabric">
+    <Position X="5.25" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAQAAAAAAAAgAAA=</HashCode>
+      <FileName>MVVM\ViewModel\Fabric\StudentsViewModelFabric.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.LessonsViewModel">
+    <Position X="2.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MVVM\ViewModel\LessonsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.MarksViewModel">
+    <Position X="14.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MVVM\ViewModel\MarksViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.HomeworksViewModel">
+    <Position X="8.25" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MVVM\ViewModel\HomeworksViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.StudentsHomeworksViewModel">
+    <Position X="6.5" Y="7" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>wIAAAEAAAAAAAAAAAKAAAAAgAAAAAAARAAAAEwIIAIE=</HashCode>
+      <FileName>MVVM\ViewModel\StudentsHomeworksViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.TeachersHomeworksViewModel">
+    <Position X="9.25" Y="7" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>wIAAAEAAAAAAAAgAAKAIAAAgAAAACAATAAgAEwIIAIE=</HashCode>
+      <FileName>MVVM\ViewModel\TeachersHomeworksViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.TeachersLessonsViewModel">
+    <Position X="3.25" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>xQAAAEEAAAAAAAAABAAAAAAABAAAAAQDAAAAAwAIAAA=</HashCode>
+      <FileName>MVVM\ViewModel\TeachersLessonsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.StudentsLessonsViewModel">
+    <Position X="0.5" Y="7" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>xQAAAEEAAAAAAAAABAAAAAAABAAAAAQBAAAAAwAIAAA=</HashCode>
+      <FileName>MVVM\ViewModel\StudentsLessonsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.StudentsMarksViewModel">
+    <Position X="13.25" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAIAAA=</HashCode>
+      <FileName>MVVM\ViewModel\StudentsMarksViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientApp.MVVM.ViewModel.TeachersMarksViewModel">
+    <Position X="15.5" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>wAAAAEAAAEAAAABAAAAAQAAAAAAAAAgCAAAIAgAIAAA=</HashCode>
+      <FileName>MVVM\ViewModel\TeachersMarksViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

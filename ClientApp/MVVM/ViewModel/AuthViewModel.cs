@@ -3,6 +3,7 @@ using ClientApp.MVVM.View;
 using Networking.NetTools;
 using Networking.Requests;
 using Newtonsoft.Json;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,7 +53,15 @@ namespace ClientApp.MVVM.ViewModel
 				string json = JsonConvert.SerializeObject(options);
 				byte[] request = Encoding.UTF8.GetBytes(json);
 				App app = (App)Application.Current;
-				app.Address = IPAddressTools.GetLocalIP();
+				try
+				{
+					app.Address = IPAddressTools.GetLocalIP();
+				}
+				catch (Exception ex)
+				{
+                    ErrorMessage = "Cannot connect to the server. Try again";
+                    return;
+                }
 				app.Port = 20;
 				if (!(await app.CanConnect()))
 				{
