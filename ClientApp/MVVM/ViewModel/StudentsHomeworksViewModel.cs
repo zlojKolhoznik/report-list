@@ -5,7 +5,6 @@ using Networking.DataViews;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClientApp.MVVM.ViewModel
@@ -24,12 +23,20 @@ namespace ClientApp.MVVM.ViewModel
 
         public  StudentsHomeworksViewModel()
         {
-            model = new StudentsHomeworksModel();
-            Subjects = model.GetSubjects();
-            Subjects.Insert(0, new SubjectDataView() { Id = null, Name = "Будь-який" });
-            IsDateUsed = true;
-            SelectedSubjectId = null;
-            SelectedHomeworkId = null;
+            try
+            {
+                model = new StudentsHomeworksModel();
+                Subjects = model.GetSubjects();
+                Subjects.Insert(0, new SubjectDataView() { Id = null, Name = "Будь-який" });
+                IsDateUsed = true;
+                SelectedSubjectId = null;
+                SelectedHomeworkId = null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The app will close. Try using it later");
+            }
         }
 
         public bool IsDateUsed

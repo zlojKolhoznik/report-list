@@ -22,18 +22,26 @@ namespace ClientApp.MVVM.ViewModel
 
 		public TeachersMarksViewModel()
 		{
-            MarksViews = new List<string>();
-            model = new TeachersMarksModel();
-            Groups = model.GetGroups();
-            subjects = new List<SubjectDataView>();
-            foreach (var group in Groups)
-            {
-                List<SubjectDataView> temp = model.GetSubjects(group);
-                subjects.AddRange(temp.ExceptBy(subjects.Select(s => s.Id), s => s.Id));
+			try
+			{
+				MarksViews = new List<string>();
+				model = new TeachersMarksModel();
+				Groups = model.GetGroups();
+				subjects = new List<SubjectDataView>();
+				foreach (var group in Groups)
+				{
+					List<SubjectDataView> temp = model.GetSubjects(group);
+					subjects.AddRange(temp.ExceptBy(subjects.Select(s => s.Id), s => s.Id));
+				}
+				subjects.Insert(0, new SubjectDataView { Name = "Будь-який", Id = null });
+				SelectedSubjectId = null;
+				SelectedGroupId = (int)groups!.First().Id!;
+			}
+			catch (Exception ex)
+			{
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The app will close. Try using it later");
             }
-            subjects.Insert(0, new SubjectDataView { Name = "Будь-який", Id = null });
-            SelectedSubjectId = null;
-            SelectedGroupId = (int)groups!.First().Id!;
 		}
 
 

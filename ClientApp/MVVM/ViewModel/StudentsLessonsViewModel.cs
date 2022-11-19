@@ -19,12 +19,20 @@ namespace ClientApp.MVVM.ViewModel
 
 		public StudentsLessonsViewModel()
 		{
-			model = new StudentsLessonsModel();
-			Subjects = model.GetSubjects();
-			Subjects.Insert(0, new SubjectDataView { Id = null, Name = "Будь-який" });
-			selectedSubjectId = null;
-			date = DateTime.Now.Date;
-			IsDateIncluded = true;
+			try
+			{
+				model = new StudentsLessonsModel();
+				Subjects = model.GetSubjects();
+				Subjects.Insert(0, new SubjectDataView { Id = null, Name = "Будь-який" });
+				selectedSubjectId = null;
+				date = DateTime.Now.Date;
+				IsDateIncluded = true;
+			}
+			catch (Exception ex)
+			{
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("The app will close. Try using it later");
+            }
 		}
 
 		public List<SubjectDataView> Subjects
